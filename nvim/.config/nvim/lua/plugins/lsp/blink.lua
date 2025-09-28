@@ -92,8 +92,8 @@ return {
 					copilot = {
 						name = "copilot",
 						module = "blink-copilot",
-						min_keyword_length = 2,
-						score_offset = 90,
+						min_keyword_length = 3,
+						score_offset = 100,
 						async = true,
 					},
 					lsp = {
@@ -109,7 +109,7 @@ return {
 						-- Disabling fallbacks as my snippets wouldn't show up when editing
 						-- lua files
 						-- fallbacks = { "snippets", "buffer" },
-						score_offset = 100, -- the higher the number, the higher the priority
+						score_offset = 99, -- the higher the number, the higher the priority
 					},
 					path = {
 						name = "Path",
@@ -317,6 +317,12 @@ return {
 
 		--- @module 'blink.pairs'
 		--- @type blink.pairs.Config
-		opts = {},
+		opts = {
+			mappings = {
+				-- Use super tab to jump if there are no snippets
+				--
+				disabled_filetypes = { "tex" },
+			},
+		},
 	},
 }

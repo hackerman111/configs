@@ -34,7 +34,7 @@ return {
 		keys = {
 			{
 				"s",
-				mode = { "n", "x", "o" },
+				mode = { "n" },
 				function()
 					-- 's' запускает flash
 					require("flash").jump()
@@ -60,7 +60,7 @@ return {
 			},
 			{
 				"<leader>l", -- Клавиша для вызова прыжка
-				mode = { "n", "x", "o" },
+				mode = { "n" },
 				function()
 					-- ⚙️ Здесь мы используем вашу адаптированную функцию
 					require("flash").jump({

@@ -45,7 +45,7 @@ local snippets = {}
 ---------------------------------------------------
 
 snippets.structure = {
-	s("Preamble", {
+	s({ trig = "Preamble", name = "Preamble", dscr = "Create a new Preamble", snippetType = "autosnippet" }, {
 		t({
 			"\\documentclass[a4paper, 12pt]{article}",
 			"\\usepackage[T2A]{fontenc}",
@@ -923,6 +923,9 @@ snippets.misc = {
 			return string.format("\\overleftarrow{%s}", snip.captures[1])
 		end, {})
 	),
+
+	s({ trig = "lr", name = "Left right arrow", snippetType = "autosnippet" }, t("\\Leftrightarrow")),
+	s({ trig = "ra", name = " Right arrow", snippetType = "autosnippet" }, t("\\Rightarrow")),
 	s({ trig = "+..", name = "Plus-ldots", snippetType = "autosnippet" }, t("+ \\ldots + ")),
 	s({ trig = ",..", name = "Comma-ldots", snippetType = "autosnippet" }, t(", \\ldots , ")),
 	s(
