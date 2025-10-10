@@ -14,7 +14,6 @@ if not vim.loop.fs_stat(lazypath) then
 	})
 end
 vim.opt.rtp:prepend(lazypath)
-
 -- Настройка lazy.nvim
 -- Он будет автоматически загружать все файлы .lua из директории lua/plugins/
 require("lazy").setup({

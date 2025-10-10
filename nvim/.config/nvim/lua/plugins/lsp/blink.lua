@@ -20,7 +20,8 @@ return {
 			suggestion = { enabled = false },
 			panel = { enabled = false },
 			filetypes = {
-				markdown = true,
+				markdown = false,
+				tex = false,
 				help = true,
 			},
 		},
@@ -52,12 +53,7 @@ return {
 				local filetype = vim.bo[0].filetype
 				-- Disable for Telescope buffers
 
-				if
-					filetype == "TelescopePrompt"
-					or filetype == "minifiles"
-					or filetype == "snacks_picker_input"
-					or filetype == "tex"
-				then
+				if filetype == "TelescopePrompt" or filetype == "minifiles" or filetype == "snacks_picker_input" then
 					return false
 				end
 				return true
@@ -65,6 +61,8 @@ return {
 			-- NOTE: The new way to enable LuaSnip
 			-- Merge custom sources with the existing ones from lazyvim
 			-- NOTE: by default lazyvim already includes the lazydev source, so not adding it here again
+			opts.snippets = { snippets = { preset = "luasnip" } }
+
 			opts.sources = vim.tbl_deep_extend("force", opts.sources or {}, {
 				-- The trigger_characters option is removed from here as we want snippets to show always
 
@@ -75,8 +73,10 @@ return {
 					"emoji",
 					"dictionary",
 					"copilot",
+					"snippets",
 					"ripgrep",
 				},
+
 				providers = {
 					ripgrep = {
 						module = "blink-ripgrep",
@@ -85,7 +85,7 @@ return {
 						---@module "blink-ripgrep"
 						---@type blink-ripgrep.Options
 						opts = {
-							prefix_min_len = 2,
+							prefix_min_len = 3,
 						},
 					},
 
@@ -119,7 +119,7 @@ return {
 						-- suggestions, I want those to show only if there are no path
 						-- suggestions
 						fallbacks = { "snippets", "buffer" },
-						min_keyword_length = 2,
+						min_keyword_length = 0,
 						opts = {
 							trailing_slash = false,
 							label_trailing_slash = true,
@@ -139,12 +139,6 @@ return {
 					},
 					-- Example on how to configure dadbod found in the main repo
 					-- https://github.com/kristijanhusak/vim-dadbod-completion
-					dadbod = {
-						name = "Dadbod",
-						module = "vim_dadbod_completion.blink",
-						min_keyword_length = 2,
-						score_offset = 85, -- the higher the number, the higher the priority
-					},
 					-- https://github.com/moyiz/blink-emoji.nvim
 					emoji = {
 						module = "blink-emoji",
@@ -166,7 +160,7 @@ return {
 						-- https://github.com/Kaiser-Yang/blink-cmp-dictionary/issues/2
 						enabled = true,
 						max_items = 8,
-						min_keyword_length = 3,
+						min_keyword_length = 5,
 						opts = {
 							-- -- The dictionary by default now uses fzf, make sure to have it
 							-- -- installed
@@ -220,12 +214,12 @@ return {
 						--},
 					},
 				},
-				--   keyword = {
-				--     -- 'prefix' will fuzzy match on the text before the cursor
-				--     -- 'full' will fuzzy match on the text before *and* after the cursor
-				--     -- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
-				--     range = "full",
-				--   },
+				keyword = {
+					-- 'prefix' will fuzzy match on the text before the cursor
+					-- 'full' will fuzzy match on the text before *and* after the cursor
+					-- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
+					range = "full",
+				},
 				ghost_text = { enabled = true },
 				menu = {
 					border = "single",
@@ -303,26 +297,22 @@ return {
 			return opts
 		end,
 	},
-	{
-		"saghen/blink.pairs",
-		version = "*", -- (recommended) only required with prebuilt binaries
+	--{
+	--	"saghen/blink.pairs",
+	--	version = "*", -- (recommended) only required with prebuilt binaries
 
-		-- download prebuilt binaries from github releases
-		dependencies = "saghen/blink.download",
-		-- OR build from source, requires nightly:
-		-- https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-		-- build = 'cargo build --release',
-		-- If you use nix, you can build from source using latest nightly rust with:
-		-- build = 'nix run .#build-plugin',
+	--	-- download prebuilt binaries from github releases
+	--	dependencies = "saghen/blink.download",
+	--	-- OR build from source, requires nightly:
+	--	-- https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+	--	-- build = 'cargo build --release',
+	--	-- If you use nix, you can build from source using latest nightly rust with:
+	--	-- build = 'nix run .#build-plugin',
 
-		--- @module 'blink.pairs'
-		--- @type blink.pairs.Config
-		opts = {
-			mappings = {
-				-- Use super tab to jump if there are no snippets
-				--
-				disabled_filetypes = { "tex" },
-			},
-		},
-	},
+	--	opts = {
+	--		mappings = {
+	--			disabled_filetypes = { "tex" },
+	--		},
+	--	},
+	--},
 }

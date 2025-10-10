@@ -2,6 +2,7 @@ local opt = vim.opt
 
 vim.g.mapleader = " "
 vim.cmd("set termguicolors")
+--vim.cmd("set clipboard+=unnamedplus")
 vim.api.nvim_command("highlight BoldUnderline guisp=white guifg=white gui=bold,underline")
 
 -- Внешний вид

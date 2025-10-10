@@ -75,19 +75,19 @@ return {
 	},
 
 	-- УЛУЧШЕННЫЕ f/t: Flit для точной навигации по строке
-	{
-		"ggandor/flit.nvim",
-		event = "VeryLazy",
-		dependencies = { "ggandor/leap.nvim" },
-		config = function()
-			require("flit").setup({
-				-- Используем стандартные клавиши f, F, t, T
-				keys = { f = "f", F = "F", t = "t", T = "T" },
-				-- Включаем метки во всех режимах для наглядности
-				labeled_modes = "nox",
-				-- Повторение команды по той же клавише (например, f -> ;)
-				clever_repeat = true,
-			})
-		end,
-	},
+	-- 	{
+	-- 		"ggandor/flit.nvim",
+	-- 		event = "VeryLazy",
+	-- 		dependencies = { "ggandor/leap.nvim" },
+	-- 		config = function()
+	-- 			require("flit").setup({
+	-- 				-- Используем стандартные клавиши f, F, t, T
+	-- 				keys = { f = "f", F = "F", t = "t", T = "T" },
+	-- 				-- Включаем метки во всех режимах для наглядности
+	-- 				labeled_modes = "nox",
+	-- 				-- Повторение команды по той же клавише (например, f -> ;)
+	-- 				clever_repeat = true,
+	-- 			})
+	-- 		end,
+	-- 	},
 }
