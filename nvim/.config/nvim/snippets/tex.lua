@@ -53,6 +53,7 @@ snippets.structure = {
 		snippetType = "autosnippet",
 	}, {
 		t({
+			"%!TEX program = lualatex",
 			"\\documentclass[12pt,a4paper]{article}",
 			"",
 			"% ——————————————————————————————————————————————————",
@@ -66,9 +67,11 @@ snippets.structure = {
 			"",
 			"\\usepackage{fontspec}",
 			"\\defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}",
-			"\\setmainfont{Libertinus Math Regular}",
 			"",
 			"\\usepackage{unicode-math}",
+			"\\setmainfont{Fira Sans}",
+			"\\setmathfont{Latin Modern Math}",
+			" ",
 			"",
 			"\\usepackage{microtype} % Улучшенная микро-типографика",
 			"\\usepackage{subfiles}",
@@ -91,10 +94,10 @@ snippets.structure = {
 			"\\usepackage{fontawesome5}",
 			"",
 			"% Утонченная академическая палитра",
-			"definecolor{DeepTeal}{HTML}{003153}     % Акцент",
-			"definecolor{SoftSand}{HTML}{f8f9fa}     % Фон блоков",
-			"definecolor{WarmGray}{HTML}{607d8b}     % Детали",
-			"definecolor{OffBlack}{HTML}{212121}     % Текст",
+			"\\definecolor{DeepTeal}{HTML}{003153}     % Акцент",
+			"\\definecolor{SoftSand}{HTML}{f8f9fa}     % Фон блоков",
+			"\\definecolor{WarmGray}{HTML}{607d8b}     % Детали",
+			"\\definecolor{OffBlack}{HTML}{212121}     % Текст",
 			"",
 			"\\usepackage[most]{tcolorbox}",
 			"\\tcbuselibrary{breakable, skins, theorems}",
@@ -124,8 +127,9 @@ snippets.structure = {
 			"}",
 			"\\newtcolorbox{solutionbox}[1][]{",
 			"    title={\\faCheckSquare\\quad Решение},",
-			"before upper={\\addcontentsline{toc}{subsection}{Задача \\thetcbcounter}}",
-			"    borderline west={1.5pt}{0pt}{WarmGray}, #1",
+			"    borderline west={1.5pt}{0pt}{WarmGray},",
+			"before upper={\\addcontentsline{toc}{subsection}{Решение \\thetcbcounter}}",
+			", #1",
 			"}",
 			"\\newtcolorbox{proofbox}[1][]{",
 			"    title={\\faCubes\\quad Доказательство},",
@@ -196,7 +200,7 @@ snippets.structure = {
 			"  \\centering",
 			"  {\\scshape\\Huge ",
 		}),
-		rep(3),
+		rep(1),
 		t({
 			"}",
 			"  {\\scshape\\Huge ",
@@ -210,6 +214,7 @@ snippets.structure = {
 			"\\end{titlepage}",
 			"\\tableofcontents",
 			"\\newpage",
+			"",
 		}),
 		i(0),
 		t({
@@ -275,7 +280,7 @@ snippets.analysis = {
 		t("}{\\underset{"),
 		i(1, "i"),
 		t(" = "),
-		i(2, "1"),
+		i(2, "0"),
 		t("}{\\sum}} "),
 		i(4, "a_i"),
 	}),
@@ -479,6 +484,9 @@ snippets.general_math = {
 	s({ trig = "Qq", name = "Rational Numbers", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{Q}")),
 	s({ trig = "Ff", name = "Field", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{F}")),
 	s({ trig = "Ee", name = "Euclidean Space", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{E}")),
+	s({ trig = "Vv", name = "Algebraic Space", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{V}")),
+	s({ trig = "Kk", name = "Polynom ring", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{K}")),
+	s({ trig = "AF", name = "Afine Space", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{A}")),
 	s({ trig = "!=", name = "Not Equal", snippetType = "autosnippet" }, t("\\ne ")),
 	s({ trig = ">=", name = "Greater or Equal", wordTrig = true, snippetType = "autosnippet" }, t("\\ge ")),
 	s({ trig = "<=", name = "Less or Equal", wordTrig = true, snippetType = "autosnippet" }, t("\\le ")),
@@ -496,6 +504,7 @@ snippets.general_math = {
 	),
 	s({ trig = "par", name = "Partial", wordTrig = true, snippetType = "autosnippet" }, t("\\partial")),
 	s({ trig = ";in", name = "Infinity", snippetType = "autosnippet" }, t("\\infty")),
+	s({ trig = "spec", name = "Spectr", snippetType = "autosnippet" }, t("\\mathrm{Spec}")),
 }
 
 ---------------------------------------------------
@@ -616,13 +625,14 @@ snippets.greek_letters = {
 	s({ trig = ";s", name = "sigma", snippetType = "autosnippet" }, t("\\sigma")),
 	s({ trig = ";S", name = "sigma", snippetType = "autosnippet" }, t("\\Sigma")),
 	s({ trig = ";D", name = "delta", snippetType = "autosnippet" }, t("\\delta")),
-	s({ trig = ";e", name = "Epsilon", snippetType = "autosnippet" }, t("\\epsilon")),
+	s({ trig = ";ep", name = "Epsilon", snippetType = "autosnippet" }, t("\\epsilon")),
 	s({ trig = ";l", name = "Lambda", snippetType = "autosnippet" }, t("\\lambda")),
-	s({ trig = ";E", name = "Up epsilon", snippetType = "autosnippet" }, t("\\mathcal{E}")),
+	s({ trig = ";Ep", name = "Up epsilon", snippetType = "autosnippet" }, t("\\mathcal{E}")),
 	s({ trig = ";x", name = "Xi", snippetType = "autosnippet" }, t("\\xi")),
 	s({ trig = ";z", name = "Zeta", snippetType = "autosnippet" }, t("\\zeta")),
 	s({ trig = ";O", name = "Omega", snippetType = "autosnippet" }, t("\\Omega")),
 	s({ trig = ";o", name = "omega", snippetType = "autosnippet" }, t("\\omega ")),
+	s({ trig = ";et", name = "eta", snippetType = "autosnippet" }, t("\\eta ")),
 	s(
 		{ trig = "pi", name = "Pi", snippetType = "autosnippet" },
 		t("\\uppi"),
@@ -669,6 +679,24 @@ snippets.delimiters = {
 		{ trig = "<<", name = "left< right>", snippetType = "autosnippet" },
 		{ t("\\left< "), i(1), t(" \\right> "), i(0) }
 	),
+	s({
+		trig = "bcase",
+		name = "Bracket Case System",
+		dscr = "System with a left square bracket",
+	}, {
+		t({
+			"\\left[",
+			"\t\\begin{gathered}",
+			"\t\t",
+		}),
+		i(1, "x \\le y \\\\ \\\\ x < y"),
+		t({
+			"",
+			"\t\\end{gathered}",
+			"\\right.",
+		}),
+		i(0),
+	}),
 }
 
 ---------------------------------------------------

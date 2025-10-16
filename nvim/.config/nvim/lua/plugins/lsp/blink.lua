@@ -71,23 +71,32 @@ return {
 					"path",
 					"buffer",
 					"emoji",
-					"dictionary",
+					--			"dictionary",
 					"copilot",
-					"snippets",
-					"ripgrep",
+					--				"snippets",
+					--"ripgrep",
 				},
 
 				providers = {
-					ripgrep = {
-						module = "blink-ripgrep",
-						name = "Ripgrep",
-						-- see the full configuration below for all available options
-						---@module "blink-ripgrep"
-						---@type blink-ripgrep.Options
-						opts = {
-							prefix_min_len = 3,
-						},
-					},
+					-- snippets = {
+					-- 	name = "[snip]",
+					-- 	min_keyword_length = 1,
+					-- 	score_offset = -1,
+					-- 	opts = {
+					-- 		clipboard_register = "+", -- register to use for `$CLIPBOARD`
+					-- 		show_autosnippets = false,
+					-- 	},
+					-- },
+					-- ripgrep = {
+					-- 	module = "blink-ripgrep",
+					-- 	name = "Ripgrep",
+					-- 	-- see the full configuration below for all available options
+					-- 	---@module "blink-ripgrep"
+					-- 	---@type blink-ripgrep.Options
+					-- 	opts = {
+					-- 		prefix_min_len = 3,
+					-- 	},
+					-- },
 
 					copilot = {
 						name = "copilot",
@@ -153,42 +162,35 @@ return {
 					--
 					-- NOTE: For the word definitions make sure "wn" is installed
 					-- brew install wordnet
-					dictionary = {
-						module = "blink-cmp-dictionary",
-						name = "Dict",
-						score_offset = 20, -- the higher the number, the higher the priority
-						-- https://github.com/Kaiser-Yang/blink-cmp-dictionary/issues/2
-						enabled = true,
-						max_items = 8,
-						min_keyword_length = 5,
-						opts = {
-							-- -- The dictionary by default now uses fzf, make sure to have it
-							-- -- installed
-							-- -- https://github.com/Kaiser-Yang/blink-cmp-dictionary/issues/2
-							--
-							-- Do not specify a file, just the path, and in the path you need to
-							-- have your .txt files
-							dictionary_directories = { vim.fn.expand("~/github/dotfiles-latest/dictionaries") },
-							-- Notice I'm also adding the words I add to the spell dictionary
-							dictionary_files = {
-								vim.fn.expand("~/github/dotfiles-latest/neovim/neobean/spell/en.utf-8.add"),
-								vim.fn.expand("~/github/dotfiles-latest/neovim/neobean/spell/es.utf-8.add"),
-							},
-							-- --  NOTE: To disable the definitions uncomment this section below
-							--
-							-- separate_output = function(output)
-							--   local items = {}
-							--   for line in output:gmatch("[^\r\n]+") do
-							--     table.insert(items, {
-							--       label = line,
-							--       insert_text = line,
-							--       documentation = nil,
-							--     })
-							--   end
-							--   return items
-							-- end,
-						},
-					},
+					-- dictionary = {
+					-- 	module = "blink-cmp-dictionary",
+					-- 	name = "Dict",
+					-- 	-- https://github.com/Kaiser-Yang/blink-cmp-dictionary/issues/2
+					-- 	min_keyword_length = 2,
+					-- 	opts = {
+					-- 		-- -- The dictionary by default now uses fzf, make sure to have it
+					-- 		-- -- installed
+					-- 		-- -- https://github.com/Kaiser-Yang/blink-cmp-dictionary/issues/2
+					-- 		--
+					-- 		-- Do not specify a file, just the path, and in the path you need to
+					-- 		-- have your .txt files
+					-- 		dictionary_directories = { vim.fn.expand("~/.config/nvim/dict") },
+					-- 		-- Notice I'm also adding the words I add to the spell dictionary
+					-- 		-- --  NOTE: To disable the definitions uncomment this section below
+					-- 		--
+					-- 		-- separate_output = function(output)
+					-- 		--   local items = {}
+					-- 		--   for line in output:gmatch("[^\r\n]+") do
+					-- 		--     table.insert(items, {
+					-- 		--       label = line,
+					-- 		--       insert_text = line,
+					-- 		--       documentation = nil,
+					-- 		--     })
+					-- 		--   end
+					-- 		--   return items
+					-- 		-- end,
+					-- 	},
+					-- },
 					-- -- Third class citizen mf always talking shit
 					-- copilot = {
 					--   name = "copilot",
@@ -220,7 +222,7 @@ return {
 					-- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
 					range = "full",
 				},
-				ghost_text = { enabled = true },
+				ghost_text = { enabled = false },
 				menu = {
 					border = "single",
 					draw = {
