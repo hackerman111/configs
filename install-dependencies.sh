@@ -8,12 +8,14 @@
 
 set -e  # Остановка при ошибке
 
+
 # Цвета для вывода
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
 
 # Функции для красивого вывода
 print_info() {
@@ -86,9 +88,6 @@ HYPRLAND_PACKAGES=(
     hyprland           # Оконный менеджер
     hyprpaper          # Обои для Hyprland
     xdg-desktop-portal-hyprland  # Desktop portal
-    qt5-wayland        # Qt5 для Wayland
-    qt6-wayland        # Qt6 для Wayland
-    polkit-kde-agent   # Агент аутентификации
 )
 
 print_info "Установка: ${HYPRLAND_PACKAGES[*]}"
@@ -215,6 +214,17 @@ CLI_TOOLS=(
     htop               # Монитор процессов
     ncdu               # Анализатор дисков
     tldr               # Упрощенные man-страницы
+    yazi 
+    ffmpeg 
+    7zip 
+    jq 
+    poppler 
+    fd 
+    ripgrep 
+    fzf 
+    zoxide 
+    resvg 
+    ImageMagick
 )
 
 print_info "Установка: ${CLI_TOOLS[*]}"
