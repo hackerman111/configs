@@ -16,7 +16,7 @@ opt.tabstop = 4 -- Ширина табуляции в пробелах
 opt.shiftwidth = 4 -- Ширина отступа для автоотступа
 opt.expandtab = true -- Использовать пробелы вместо табов
 opt.autoindent = true -- Включать автоотступ
-
+vim.opt.undolevels = 5000
 -- Поиск
 opt.ignorecase = true -- Игнорировать регистр при поиске
 opt.smartcase = true -- Учитывать регистр, если в запросе есть заглавные буквы

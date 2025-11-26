@@ -202,6 +202,7 @@ snippets.structure = {
 		}),
 		rep(1),
 		t({
+			" ",
 			"}",
 			"  {\\scshape\\Huge ",
 		}),
@@ -290,14 +291,26 @@ snippets.analysis = {
 		{ t("\\int "), i(1, "f(x)"), t(" \\;\\mathrm{d} "), i(2, "x") }
 	),
 	s({ trig = "dint", name = "Definite Integral", priority = 300, snippetType = "autosnippet" }, {
-		t("\\int_{"),
+		t("\\int_{ "),
 		i(1, "-\\infty"),
-		t("}^{"),
+		t(" }^{ "),
 		i(2, "\\infty"),
-		t("} "),
+		t(" } "),
 		i(3, "f(x)"),
-		t(" \\, \\mathrm{d} "),
+		t(" \\, \\mathrm{d}\\lambda \\left("),
 		i(4, "x"),
+		t("\\right) "),
+		i(0),
+	}),
+	s({ trig = "leb", name = "Lebeg int", snippetType = "autosnippet" }, {
+		t("\\int_{ "),
+		i(1, "-\\infty"),
+		t(" }^{ "),
+		i(2, "\\infty"),
+		t(" } "),
+		t(" \\, \\mathrm{d}\\lambda \\left( "),
+		i(3, "x"),
+		t(" \\right) "),
 		i(0),
 	}),
 	s(
@@ -353,10 +366,6 @@ snippets.linear_algebra = {
 	s({ trig = "Ker", name = "Kernel", wordTrig = true, snippetType = "autosnippet" }, t("\\mathrm{Ker}")),
 	s({ trig = "Im", name = "Image", wordTrig = true, snippetType = "autosnippet" }, t("\\mathrm{Im}")),
 	s({ trig = "tr", name = "Trace", wordTrig = true, snippetType = "autosnippet" }, t("\\mathrm{tr}")),
-	s(
-		{ trig = "pr", name = "Projection", wordTrig = true, snippetType = "autosnippet" },
-		{ t("\\mathrm{pr}_{"), i(1, "v"), t("}{"), i(2, "u"), t("}") }
-	),
 	s(
 		{ trig = "ort", name = "Orthogonal", wordTrig = true, snippetType = "autosnippet" },
 		{ t("\\mathrm{ort}_{"), i(1, "v"), t("}{"), i(2, "u"), t("}") }
@@ -481,6 +490,7 @@ snippets.general_math = {
 	s({ trig = "Qq", name = "Rational Numbers", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{Q}")),
 	s({ trig = "Ff", name = "Field", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{F}")),
 	s({ trig = "Ee", name = "Euclidean Space", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{E}")),
+	s({ trig = "Dd", name = "Euclidean Space", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{D}")),
 	s({ trig = "Vv", name = "Algebraic Space", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{V}")),
 	s({ trig = "Kk", name = "Polynom ring", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{K}")),
 	s({ trig = "AF", name = "Afine Space", wordTrig = true, snippetType = "autosnippet" }, t("\\mathbb{A}")),
@@ -621,6 +631,7 @@ snippets.environments = {
 ---------------------------------------------------
 snippets.greek_letters = {
 	s({ trig = ";a", name = "Alpha", snippetType = "autosnippet" }, t("\\alpha")),
+	s({ trig = ";th", name = "Theta", snippetType = "autosnippet" }, t("\\theta")),
 	s({ trig = ";b", name = "Beta", snippetType = "autosnippet" }, t("\\beta")),
 	s({ trig = ";g", name = "Gamma", snippetType = "autosnippet" }, t("\\gamma")),
 	s({ trig = ";s", name = "sigma", snippetType = "autosnippet" }, t("\\sigma")),
@@ -732,7 +743,8 @@ snippets.postfix_and_auto = (function()
 		return snippets_list
 	end
 
-	local func_triggers = { "sin", "cos", "tan", "csc", "sec", "cot", "ln", "log", "exp", "arcsin", "arctan", "arcsec" }
+	local func_triggers =
+		{ "sin", "cos", "tan", "csc", "sec", "cot", "ln", "log", "exp", "arcsin", "arctan", "arcsec", "arccot" }
 	local greek_triggers = {
 		"alpha",
 		"beta",
