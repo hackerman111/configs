@@ -1,0 +1,5 @@
+[manager]
+prepend_keymap = [
+    { on = "h", run = "enter", desc = "Войти в директорию (вместо l)" },
+    { on = "l", run = "leave", desc = "Вернуться в родительскую директорию (вместо h)" }
+]
