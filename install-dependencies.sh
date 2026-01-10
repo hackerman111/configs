@@ -128,25 +128,6 @@ sudo systemctl enable bluetooth.service
 sudo systemctl start bluetooth.service
 
 # ============================================================================
-# 5. УСТАНОВКА PIPEWIRE (ЗВУК)
-# ============================================================================
-
-print_section "5. Установка Pipewire (аудио система)"
-
-AUDIO_PACKAGES=(
-    pipewire           # Аудио сервер
-    wireplumber        # Менеджер сессий
-    pipewire-audio     # Аудио поддержка
-    pipewire-pulse     # PulseAudio совместимость
-    pipewire-alsa      # ALSA совместимость
-    pipewire-jack      # JACK совместимость
-)
-
-print_info "Установка: ${AUDIO_PACKAGES[*]}"
-sudo pacman -S --needed --noconfirm "${AUDIO_PACKAGES[@]}"
-print_success "Pipewire установлен"
-
-# ============================================================================
 # 6. УСТАНОВКА ТЕРМИНАЛОВ И ШЕЛЛА
 # ============================================================================
 
@@ -208,7 +189,6 @@ CLI_TOOLS=(
     zoxide             # Умный cd
     starship           # Промпт
     lazygit            # TUI для Git
-    delta              # Улучшенный git diff
     thefuck            # Исправление команд
     tree               # Дерево каталогов
     htop               # Монитор процессов
@@ -224,7 +204,7 @@ CLI_TOOLS=(
     fzf 
     zoxide 
     resvg 
-    ImageMagick
+    stow
 )
 
 print_info "Установка: ${CLI_TOOLS[*]}"
@@ -262,9 +242,9 @@ print_success "Neovim и зависимости установлены"
 
 # Установка Python пакетов
 print_info "Установка Python пакетов..."
-pip install --user --upgrade pip
-pip install --user pynvim black isort ruff pyright
-print_success "Python пакеты установлены"
+#pip install --user --upgrade pip
+#pip install --user pynvim black isort ruff pyright --break-system-packages
+#print_success "Python пакеты установлены"
 
 # ============================================================================
 # 10. УСТАНОВКА LATEX
