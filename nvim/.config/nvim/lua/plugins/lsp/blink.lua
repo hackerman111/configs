@@ -61,7 +61,7 @@ return {
             -- NOTE: The new way to enable LuaSnip
             -- Merge custom sources with the existing ones from lazyvim
             -- NOTE: by default lazyvim already includes the lazydev source, so not adding it here again
-            -- opts.snippets = { snippets = { preset = "luasnip" } }
+            opts.snippets = { snippets = { preset = "luasnip" } }
 
             opts.sources = vim.tbl_deep_extend("force", opts.sources or {}, {
                 -- The trigger_characters option is removed from here as we want snippets to show always
@@ -73,7 +73,7 @@ return {
                     "emoji",
                     --			"dictionary",
                     "copilot",
-                    --				"snippets",
+                    "snippets",
                     --"ripgrep",
                 },
 

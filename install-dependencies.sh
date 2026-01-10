@@ -16,6 +16,10 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+DOTFILES_REPO="https://github.com/hackerman111/configs.git"
+
+# Папка, куда будет скачан репозиторий
+DOTFILES_DIR="$HOME/configs"
 
 # Функции для красивого вывода
 print_info() {
@@ -266,15 +270,10 @@ LATEX_PACKAGES=(
     inkscape           # Векторная графика (для inkscape-figures)
 )
 
-read -p "Установить LaTeX? (требует ~2GB места) [y/N] " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    print_info "Установка: ${LATEX_PACKAGES[*]}"
-    sudo pacman -S --needed --noconfirm "${LATEX_PACKAGES[@]}"
-    print_success "LaTeX установлен"
-else
-    print_warning "LaTeX не установлен (пропущено по выбору пользователя)"
-fi
+print_info "Начинается установка LaTeX (может занять время, ~2GB)..."
+print_info "Установка: ${LATEX_PACKAGES[*]}"
+sudo pacman -S --needed --noconfirm "${LATEX_PACKAGES[@]}"
+print_success "LaTeX установлен"
 
 # ============================================================================
 # 11. УСТАНОВКА ДОПОЛНИТЕЛЬНЫХ ПРИЛОЖЕНИЙ
@@ -325,6 +324,8 @@ AUR_PACKAGES=(
     bluetui            # Bluetooth TUI
     tmuxifier          # Tmux layout manager
     wordnet-cli        # Словарь (для Neovim blink-cmp)
+    obsidian
+    xkb-switch         # Переключатель раскладки (полезно для Neovim)
 )
 
 print_info "Установка из AUR: ${AUR_PACKAGES[*]}"
@@ -416,10 +417,41 @@ print_success "LSP серверы и форматтеры установлены
 print_info "Дополнительные LSP серверы будут установлены через Mason при первом запуске Neovim"
 
 # ============================================================================
+# 3. НАСТРОЙКА DOTFILES (STOW)
+# ============================================================================
+
+print_section "16. Перенос конфигурации (Stow)"
+
+print_info "Используется репозиторий: $DOTFILES_REPO"
+
+# Клонирование или обновление репозитория
+if [ ! -d "$DOTFILES_DIR" ]; then
+    print_info "Клонирование репозитория..."
+    git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
+else
+    print_info "Обновление репозитория..."
+    cd "$DOTFILES_DIR" && git pull
+fi
+
+# Применение конфигов через Stow
+if [ -d "$DOTFILES_DIR" ]; then
+    cd "$DOTFILES_DIR"
+    print_info "Применение конфигурации..."
+    
+    # Используем stow для всех папок в репозитории (эквивалент stow */)
+    # --restow перезаписывает симлинки, если они изменились
+    # Игнорируем .git
+    stow --restow --target="$HOME" --ignore=".git" */
+    
+    print_success "Конфигурация применена!"
+fi
+
+
+# ============================================================================
 # 16. ФИНАЛЬНЫЕ НАСТРОЙКИ
 # ============================================================================
 
-print_section "16. Финальные настройки"
+print_section "17. Финальные настройки"
 
 # Обновление базы данных шрифтов
 print_info "Обновление кэша шрифтов..."
