@@ -1,4 +1,2 @@
-export EDITOR=neovim
-[prepend_previewers = [
-    { name = "*.pdf", run="tdf" },
-]
+[mgr]
+show_hidden = true
