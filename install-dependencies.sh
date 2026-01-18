@@ -264,6 +264,7 @@ LATEX_PACKAGES=(
     texlive-mathscience # Математика
     texlive-luatex     # LuaTeX
     texlive-xetex      # XeTeX
+    texlive-binextra
     biber              # Библиографии
     zathura            # PDF viewer
     zathura-pdf-mupdf  # PDF плагин для Zathura
