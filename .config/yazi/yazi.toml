@@ -1,2 +1,10 @@
 [mgr]
 show_hidden = true
+[opener]
+pdf-view = [
+    { run = 'zathura %s', block = true, desc = 'View PDF with Zathura'}
+]
+[open]
+append_rules = [
+    { name = '*.pdf', use = 'pdf-view' }
+]

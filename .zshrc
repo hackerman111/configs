@@ -43,8 +43,12 @@ export PATH="$HOME/.tmuxifier/bin:$PATH"
 eval "$(tmuxifier init -)"
 eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
-eval "$(thefuck --alias fk)"
+eval "$(thefuck --alias fuck)"
 eval "$(starship init zsh)"
+
+alias vp="nmcli connection up"
+alias vd="nmcli connection down"
+
 autoload -Uz compinit
 compinit
 
@@ -83,3 +87,5 @@ function y() {
 
 export EDITOR=nvim
 
+export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"

@@ -327,6 +327,7 @@ AUR_PACKAGES=(
     wordnet-cli        # Словарь (для Neovim blink-cmp)
     obsidian
     xkb-switch         # Переключатель раскладки (полезно для Neovim)
+    neofetch
 )
 
 print_info "Установка из AUR: ${AUR_PACKAGES[*]}"

@@ -53,7 +53,7 @@ return {
                 local filetype = vim.bo[0].filetype
                 -- Disable for Telescope buffers
 
-                if filetype == "TelescopePrompt" or filetype == "minifiles" or filetype == "snacks_picker_input" then
+                if filetype == "TelescopePrompt" or filetype == "minifiles" or filetype == "snacks_picker_input" or filetype == "tex" then
                     return false
                 end
                 return true

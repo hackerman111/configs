@@ -238,14 +238,14 @@ snippets.structure = {
 
     -- Paragraph
     s(
-        { trig = "par", name = "Paragraph", dscr = "Create a new paragraph", snippetType = "autosnippet" },
-        { t("\\paragraph*{\\textbf{"), i(1, "Заголовок абзаца"), t("}}") },
+        { trig = "Par", name = "Paragraph", dscr = "Create a new paragraph", snippetType = "autosnippet" },
+        { t("\\paragraph*{"), i(1, "Заголовок абзаца"), t("}") },
         { condition = conds.line_begin }
     ),
 
     s(
         { trig = "sec", name = "Section", dscr = "Create a new section", snippetType = "autosnippet" },
-        { t("\\section*{\\textbf{"), i(1, "Section Title"), t("}}") },
+        { t("\\section*{"), i(1, "Section Title"), t("}") },
         { condition = conds.line_begin }
     ),
     s({
@@ -260,11 +260,6 @@ snippets.structure = {
         t({ "}}", "" }),
         i(2, "Content"),
     }, { condition = conds.line_begin }),
-    s(
-        { trig = "par", name = "Paragraph", dscr = "Create a new paragraph", snippetType = "autosnippet" },
-        { t("\\paragraph*{\\textbf{"), i(1, "Paragraph Title"), t("}}") },
-        { condition = conds.line_begin }
-    ),
 }
 
 ---------------------------------------------------
@@ -940,6 +935,81 @@ snippets.misc = {
         { t("\\pmod{"), i(1), t("} "), i(2) }
     ),
     s({ trig = "mcal", name = "Mathcal", snippetType = "autosnippet" }, { t("\\mathcal{"), i(1), t("} "), i(0) }),
+}
+
+---------------------------------------------------
+-- Категория 12: Курсовая (Алгебры Ли и Векторные поля)
+---------------------------------------------------
+snippets.coursework = {
+    -- 1. Скобка Ли [u, v]
+    -- Пример: [u, v]
+    s({ trig = "lie", dscr = "Lie bracket" }, {
+        t("["), i(1, "u"), t(", "), i(2, "v"), t("]")
+    }),
+
+    -- 2. Оператор дифференцирования по переменной
+    -- Пример: \frac{\partial}{\partial z_n}
+    s({ trig = "pd", dscr = "Partial derivative operator" }, {
+        t("\\frac{\\partial}{\\partial "), i(1, "z"), t("_{"), i(2, "n"), t("}}")
+    }),
+
+    -- 3. Полная запись векторного поля
+    -- Пример: f \frac{\partial}{\partial z}
+    s({ trig = "vf", dscr = "Vector field term" }, {
+        i(1, "f"), t(" \\frac{\\partial}{\\partial "), i(2, "z"), t("}")
+    }),
+
+    -- 4. Оператор Der (Алгебра дифференцирований)
+    s({ trig = "Der", dscr = "Derivation algebra operator" }, {
+        t("\\operatorname{Der}")
+    }),
+    -- 4. Оператор Der (Алгебра дифференцирований)
+    s({ trig = "Aut", dscr = "Autmorphism algebra operator" }, {
+        t("\\operatorname{Aut}")
+    }),
+
+    -- 5. Кольцо полиномов
+    -- Пример: K[z_1, ..., z_n]
+    s({ trig = "poly", dscr = "Polynomial ring" }, {
+        t("\\mathbb{K}["), i(1, "z"), t("_1, \\dots, "), rep(1), t("_{"), i(2, "n"), t("}]")
+    }),
+
+
+    -- 7. Генераторы Андриста { U, V, W }
+    s({ trig = "genA", dscr = "Andrist generators tuple" }, {
+        t("\\{ U, V, W \\}")
+    }),
+
+    -- 8. Генераторы Бельдиева { U, V }
+    s({ trig = "genB", dscr = "Beldiev generators tuple" }, {
+        t("\\{ U, V \\}")
+    }),
+
+    -- 8. Нумерованное уравнение (Equation)
+    -- Ссылка: \cref{eq:label}
+    s({ trig = "eq", dscr = "Equation with Label" }, {
+        t("\\begin{equation}\\label{eq:"),
+        i(1, "label"),
+        t("}"),
+        t({ "", "\t" }),
+        i(2, "content"),
+        t({ "", "\\end{equation}" })
+    }, { condition = conds.line_begin }),
+
+    -- 9. Нумерованное выравнивание (Align)
+    -- Для системы уравнений. Метка ставится на всю группу или конкретную строку.
+    s({ trig = "al", dscr = "Align with Label" }, {
+        t("\\begin{align}\\label{eq:"),
+        i(1, "label"),
+        t("}"),
+        t({ "", "\t" }),
+        i(2, "content"),
+        t({ "", "\\end{align}" })
+    }, { condition = conds.line_begin }),
+
+    s({ trig = "rf", dscr = "Smart Reference" }, {
+        t("\\label{"), i(1, "label"), t("}")
+    }),
 }
 
 -- Функция для сбора и возврата всех сниппетов из всех категорий
