@@ -1,0 +1,15 @@
+agg
+antigravity
+djvu2pdf
+google-chrome
+grub-customizer
+jdownloader2
+latex-mk
+neofetch-git
+visual-studio-code-bin
+warpd
+xkb-switch
+yandex-browser
+yay-bin
+yay-bin-debug
+zotero-git
