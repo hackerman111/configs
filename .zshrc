@@ -89,3 +89,6 @@ export EDITOR=nvim
 
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
+
+# opencode
+export PATH=/home/papayka/.opencode/bin:$PATH

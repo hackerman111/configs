@@ -804,6 +804,7 @@ snippets.postfix_and_auto = (function()
         "([%a])(%.,)",
         "([%a])(,%.)",
     }
+
     for _, trig_pattern in ipairs(auto_vector_triggers) do
         table.insert(
             result,
@@ -812,10 +813,14 @@ snippets.postfix_and_auto = (function()
                 name = "Auto Vector",
                 regTrig = true,
                 snippetType = "autosnippet",
-            }, { vec_node })
+            }, {
+                -- Generate a FRESH node inside the loop for each snippet
+                f(function(_, snip)
+                    return string.format("\\vec{%s} ", snip.captures[1])
+                end, {})
+            })
         )
     end
-
     return result
 end)()
 

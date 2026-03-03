@@ -28,7 +28,7 @@ return {
     },
     {
         "saghen/blink.cmp",
-        version = "1.*",
+        version = "*",
         enabled = true,
         -- In case there are breaking changes and you want to go back to the last
         -- working release
@@ -73,7 +73,7 @@ return {
                     "emoji",
                     --			"dictionary",
                     "copilot",
-                    "snippets",
+                    --"snippets",
                     --"ripgrep",
                 },
 
@@ -97,7 +97,6 @@ return {
                     -- 		prefix_min_len = 3,
                     -- 	},
                     -- },
-
                     copilot = {
                         name = "copilot",
                         module = "blink-copilot",
@@ -109,7 +108,7 @@ return {
                         name = "lsp",
                         enabled = true,
                         module = "blink.cmp.sources.lsp",
-                        min_keyword_length = 1,
+                        min_keyword_length = 0,
                         -- When linking markdown notes, I would get snippets and text in the
                         -- suggestions, I want those to show only if there are no LSP
                         -- suggestions
