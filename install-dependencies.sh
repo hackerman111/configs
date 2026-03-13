@@ -268,6 +268,10 @@ LATEX_PACKAGES=(
     biber              # Библиографии
     zathura            # PDF viewer
     zathura-pdf-mupdf  # PDF плагин для Zathura
+    zathura-djvu  # PDF плагин для Zathura
+    zathura-pdf-poppler
+    zathura-ps
+    zathura-cb
     inkscape           # Векторная графика (для inkscape-figures)
 )
 

@@ -1,0 +1,31 @@
+# ~/.config/zathura/zathurarc
+
+# более мелкий шаг = субъективно более гладкое движение
+set scroll-step 150
+
+# удобнее на границах страниц
+set scroll-page-aware true
+set scroll-full-overlap 0.05
+
+# при открытии сразу под ширину страницы
+set adjust-open width
+
+# vim-style scrolling
+map j scroll smooth-down
+map k scroll smooth-up
+map h scroll left
+map l scroll right
+
+# большие перемещения
+map <C-d> scroll half-down
+map <C-u> scroll half-up
+map <C-f> scroll full-down
+map <C-b> scroll full-up
+
+# переходы между страницами
+map J navigate next
+map K navigate previous
+
+# к началу / концу текущей страницы
+map H scroll page-top
+map L scroll page-bottom

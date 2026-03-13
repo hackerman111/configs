@@ -1,7 +1,9 @@
 return {
-	"ray-x/navigator.lua",
-	requires = {
-		{ "ray-x/guihua.lua", run = "cd lua/fzy && make" },
-		{ "neovim/nvim-lspconfig" },
-	},
+    "ray-x/navigator.lua",
+    dependencies = {
+        {
+            "ray-x/guihua.lua",
+            build = "cd lua/fzy && make",
+        },
+    },
 }
