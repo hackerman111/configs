@@ -183,8 +183,7 @@ zinit light zsh-users/zsh-completions
 zinit ice depth=1
 zinit light wfxr/forgit
 
-zinit ice depth=1
-zinit light MichaelAquilina/zsh-you-should-use
+
 
 zinit ice depth=1
 zinit light chrissicool/zsh-256color

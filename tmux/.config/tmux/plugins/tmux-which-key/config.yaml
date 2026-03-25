@@ -1,0 +1,149 @@
+command_alias_start_index: 260
+keybindings:
+  prefix_table: Space
+
+title:
+  style: align=centre,bold
+  prefix: tmux
+  prefix_style: fg=#88c0d0,align=centre,bold
+
+position:
+  x: R
+  y: P
+
+macros:
+  sessionx:
+    - send-prefix
+    - send-keys o
+  extrakto:
+    - send-prefix
+    - send-keys x
+  thumbs:
+    - send-prefix
+    - send-keys ';'
+  jump:
+    - send-prefix
+    - send-keys j
+  neolazygit:
+    - send-prefix
+    - send-keys N
+  popup-shell:
+    - display-popup -E -w 90% -h 90% -d '#{pane_current_path}' '$SHELL'
+  popup-lazygit:
+    - display-popup -E -w 92% -h 92% -d '#{pane_current_path}' 'lazygit'
+  copycat-files:
+    - send-prefix
+    - send-keys C-f
+  copycat-urls:
+    - send-prefix
+    - send-keys C-u
+
+items:
+  - name: +Session
+    key: s
+    menu:
+      - name: SessionX
+        key: o
+        macro: sessionx
+      - name: Last window
+        key: Tab
+        command: last-window
+      - name: Previous window
+        key: h
+        command: previous-window
+      - name: Next window
+        key: l
+        command: next-window
+      - name: Rename window
+        key: r
+        command: command-prompt -I '#W' 'rename-window -- "%%%"'
+
+  - name: +Pane
+    key: p
+    menu:
+      - name: Left
+        key: h
+        command: select-pane -L
+      - name: Down
+        key: j
+        command: select-pane -D
+      - name: Up
+        key: k
+        command: select-pane -U
+      - name: Right
+        key: l
+        command: select-pane -R
+      - name: Zoom
+        key: z
+        command: resize-pane -Z
+      - name: Break pane
+        key: b
+        command: break-pane
+
+  - name: +Split
+    key: w
+    menu:
+      - name: Vertical split
+        key: '|'
+        command: split-window -h -c '#{pane_current_path}'
+      - name: Horizontal split
+        key: '-'
+        command: split-window -v -c '#{pane_current_path}'
+      - name: New window
+        key: c
+        command: new-window -c '#{pane_current_path}'
+      - name: Kill pane
+        key: x
+        command: kill-pane
+
+  - name: +Copy
+    key: c
+    menu:
+      - name: Copy mode
+        key: c
+        command: copy-mode
+      - name: Thumbs hints
+        key: ';'
+        macro: thumbs
+      - name: Extrakto fuzzy copy
+        key: x
+        macro: extrakto
+      - name: Jump to visible text
+        key: j
+        macro: jump
+      - name: Copycat file search
+        key: f
+        macro: copycat-files
+      - name: Copycat url search
+        key: u
+        macro: copycat-urls
+
+  - name: +Popup
+    key: g
+    menu:
+      - name: Shell popup
+        key: p
+        macro: popup-shell
+      - name: Lazygit popup
+        key: G
+        macro: popup-lazygit
+      - name: Neolazygit
+        key: N
+        macro: neolazygit
+
+  - name: +Resize
+    key: r
+    menu:
+      - name: Wider
+        key: l
+        command: resize-pane -R 5
+      - name: Narrower
+        key: h
+        command: resize-pane -L 5
+      - name: Taller
+        key: j
+        command: resize-pane -D 5
+      - name: Shorter
+        key: k
+        command: resize-pane -U 5
+
