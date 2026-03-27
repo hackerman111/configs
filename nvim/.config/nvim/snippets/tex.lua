@@ -38,6 +38,22 @@ local function not_preceded_by_bs_or_letter(trigger)
     end
 end
 
+local function wrapped_command_snippet(trig, command, name, opts)
+    opts = opts or {}
+    return s({
+        trig = trig,
+        name = name or command,
+        dscr = opts.dscr or ("\\" .. command .. "{}"),
+        wordTrig = opts.wordTrig ~= false,
+        snippetType = opts.snippetType or "autosnippet",
+    }, {
+        t("\\" .. command .. "{"),
+        i(1, opts.placeholder or "text"),
+        t("}"),
+        i(0),
+    })
+end
+
 -- Таблица с категориями сниппетов
 local snippets = {}
 
@@ -240,6 +256,11 @@ snippets.structure = {
     s(
         { trig = "Par", name = "Paragraph", dscr = "Create a new paragraph", snippetType = "autosnippet" },
         { t("\\paragraph*{"), i(1, "Заголовок абзаца"), t("}") },
+        { condition = conds.line_begin }
+    ),
+    s(
+        { trig = "parg", name = "Paragraph", dscr = "Create a new paragraph", snippetType = "autosnippet" },
+        { t("\\paragraph{"), i(1, "Заголовок абзаца"), t("}") },
         { condition = conds.line_begin }
     ),
 
@@ -533,6 +554,15 @@ snippets.text_and_formatting = {
         { trig = "rbb", name = "Math bb", wordTrig = true, snippetType = "autosnippet" },
         { t("\\mathbb{"), i(1, "text"), t("} "), i(2) }
     ),
+    wrapped_command_snippet("opn", "operatorname", "Operator Name", { placeholder = "name" }),
+    wrapped_command_snippet("mbb", "mathbb", "Math Blackboard", { placeholder = "A" }),
+    wrapped_command_snippet("mcal", "mathcal", "Math Calligraphic", { placeholder = "A" }),
+    wrapped_command_snippet("mscr", "mathscr", "Math Script", { placeholder = "A" }),
+    wrapped_command_snippet("mfr", "mathfrak", "Math Fraktur", { placeholder = "g" }),
+    wrapped_command_snippet("msf", "mathsf", "Math Sans", { placeholder = "X" }),
+    wrapped_command_snippet("mbf", "mathbf", "Math Bold", { placeholder = "x" }),
+    wrapped_command_snippet("mrm", "mathrm", "Math Roman", { placeholder = "d" }),
+    wrapped_command_snippet("mtt", "mathtt", "Math Typewriter", { placeholder = "code" }),
 }
 
 ---------------------------------------------------
@@ -939,7 +969,6 @@ snippets.misc = {
         { trig = "mod", name = "Modulo", wordTrig = true, snippetType = "autosnippet" },
         { t("\\pmod{"), i(1), t("} "), i(2) }
     ),
-    s({ trig = "mcal", name = "Mathcal", snippetType = "autosnippet" }, { t("\\mathcal{"), i(1), t("} "), i(0) }),
 }
 
 ---------------------------------------------------

@@ -78,12 +78,9 @@ alias lt='eza --tree --level=3 --icons --git'
 alias l.='eza -a | grep -E "^\."'
 
 # editors / tooling
-alias v='nvim'
-alias vim='nvim'
 alias svim='sudo -E nvim'
 alias c='clear'
 alias lg='lazygit'
-alias g='git'
 alias k='kubectl'
 alias tf='terraform'
 alias d='docker'
@@ -183,6 +180,8 @@ zinit light zsh-users/zsh-completions
 zinit ice depth=1
 zinit light wfxr/forgit
 
+zinit ice depth=1
+zinit light MichaelAquilina/zsh-you-should-use
 
 
 zinit ice depth=1
@@ -264,27 +263,23 @@ fi
 (( $+commands[thefuck] )) && eval "$(thefuck --alias fuck)"
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 
-# -----------------------------------------------------------------------------
-# KEYBINDINGS
-# -----------------------------------------------------------------------------
 # history substring search
-bindkey "$terminfo[kcuu1]" history-substring-search-up
-bindkey "$terminfo[kcud1]" history-substring-search-down
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-bindkey -M emacs '^P' history-substring-search-up
-bindkey -M emacs '^N' history-substring-search-down
+bindkey -M viins "$terminfo[kcuu1]" history-substring-search-up
+bindkey -M viins "$terminfo[kcud1]" history-substring-search-down
+bindkey -M vicmd "$terminfo[kcuu1]" history-substring-search-up
+bindkey -M vicmd "$terminfo[kcud1]" history-substring-search-down
+
+bindkey -M viins '^[[A' history-substring-search-up
+bindkey -M viins '^[[B' history-substring-search-down
+bindkey -M vicmd '^[[A' history-substring-search-up
+bindkey -M vicmd '^[[B' history-substring-search-down
+
+bindkey -M viins '^P' history-substring-search-up
+bindkey -M viins '^N' history-substring-search-down
+
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 
-# nice widgets
-bindkey '^R' fzf-history-widget
-bindkey '^T' fzf-file-widget
-bindkey '^[c' fzf-cd-widget
-bindkey '^Y' autosuggest-accept
-bindkey -M vicmd '^R' fzf-history-widget
-bindkey -M vicmd '^T' fzf-file-widget
-bindkey -M vicmd '^[c' fzf-cd-widget
 
 # -----------------------------------------------------------------------------
 # FUNCTIONS
@@ -356,6 +351,11 @@ function zvm_after_lazy_keybindings() {
   zvm_bindkey vicmd '^R' fzf-history-widget
   zvm_bindkey vicmd '^T' fzf-file-widget
   zvm_bindkey vicmd '^[c' fzf-cd-widget
+
+  zvm_bindkey viins "$terminfo[kcuu1]" history-substring-search-up
+  zvm_bindkey viins "$terminfo[kcud1]" history-substring-search-down
+  zvm_bindkey vicmd "$terminfo[kcuu1]" history-substring-search-up
+  zvm_bindkey vicmd "$terminfo[kcud1]" history-substring-search-down
 }
 
 # -----------------------------------------------------------------------------
