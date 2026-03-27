@@ -209,6 +209,9 @@ CLI_TOOLS=(
     zoxide 
     resvg 
     stow
+    just 
+    git-delta
+    yq
 )
 
 print_info "Установка: ${CLI_TOOLS[*]}"

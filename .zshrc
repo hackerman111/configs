@@ -1,5 +1,7 @@
-# ~/.zshrc — professional Arch + Neovim + tmux oriented build
-# Основа сохранена: Zinit, zsh-vi-mode, zsh-syntax-highlighting,
+# ~/.zshrc — agent-centric terminal build
+# Goal: zsh/CLI drive project navigation, git change review and opening files in
+# a running Neovim inside tmux. Neovim stays an editor, tmux stays the shell orchestrator.
+# Base preserved: Zinit, zsh-vi-mode, zsh-syntax-highlighting,
 # zsh-completions, zsh-autosuggestions, Aloxaf/fzf-tab, starship, zoxide,
 # fzf, tmuxifier, thefuck, yazi-function, eza aliases.
 
@@ -23,7 +25,7 @@ export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.tmuxifier/bin:$PATH"
 export PATH="$HOME/.opencode/bin:$PATH"
-# tmux-open-nvim helper script (становится доступен сразу после установки TPM-плагина)
+# tmux-open-nvim helper script (available right after TPM plugin install)
 export PATH="$HOME/.tmux/plugins/tmux-open-nvim/scripts:$PATH"
 
 # keep PATH/fpath unique
@@ -78,13 +80,13 @@ alias lt='eza --tree --level=3 --icons --git'
 alias l.='eza -a | grep -E "^\."'
 
 # editors / tooling
-alias svim='sudo -E nvim'
 alias c='clear'
 alias lg='lazygit'
 alias k='kubectl'
 alias tf='terraform'
 alias d='docker'
 alias dc='docker compose'
+alias j='just'
 alias ta='tmux attach -t'
 alias tls='tmux ls'
 alias ts='tmux new-session -A -s'
@@ -131,7 +133,7 @@ source "$ZINIT_HOME/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-# Zinit annexes (твои текущие сохраняются)
+# Zinit annexes (current setup preserved)
 zinit light-mode for \
   zdharma-continuum/zinit-annex-as-monitor \
   zdharma-continuum/zinit-annex-bin-gem-node \
@@ -164,12 +166,9 @@ zstyle ':completion:*:*:docker:*' option-stacking yes
 zstyle ':completion:*:*:kubectl:*' list-grouped false
 
 # -----------------------------------------------------------------------------
-# PLUGINS — KEEP EXISTING, ONLY ADD
-# fzf-tab must be loaded after compinit and before widget wrappers like autosuggestions.
-# zsh-history-substring-search should be loaded after zsh-syntax-highlighting.
+# PLUGINS — keep existing base, add only workflow helpers
 # -----------------------------------------------------------------------------
-
-# vi mode (existing)
+# vi mode
 zinit ice depth=1
 zinit light jeffreytse/zsh-vi-mode
 
@@ -183,7 +182,6 @@ zinit light wfxr/forgit
 zinit ice depth=1
 zinit light MichaelAquilina/zsh-you-should-use
 
-
 zinit ice depth=1
 zinit light chrissicool/zsh-256color
 
@@ -196,7 +194,7 @@ mkdir -p "$XDG_CACHE_HOME/zsh"
 compinit -d "$XDG_CACHE_HOME/zsh/.zcompdump-${ZSH_VERSION}"
 zmodload zsh/complist
 
-# fzf-tab — existing, keep it in the correct order
+# fzf-tab — keep in the correct order
 zinit ice depth=1
 zinit light Aloxaf/fzf-tab
 
@@ -207,11 +205,8 @@ zinit light zsh-users/zsh-autosuggestions
 zinit ice depth=1
 zinit light hlissner/zsh-autopair
 
-# highlighting — existing
-zinit ice depth=1
-zinit light zsh-users/zsh-syntax-highlighting
 
-# history search — add after syntax-highlighting
+# history search — load after syntax-highlighting
 zinit ice depth=1
 zinit light zsh-users/zsh-history-substring-search
 
@@ -238,21 +233,71 @@ export FORGIT_FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS"
 # fzf-tab
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' fzf-bindings 'tab:accept' 'ctrl-space:toggle+down'
-zstyle ':fzf-tab:*' fzf-flags --bind=tab:accept,ctrl-j:down,ctrl-k:up,alt-j:down,alt-k:up --cycle
+zstyle ':fzf-tab:*' fzf-flags --with-nth=2 --bind=tab:accept,ctrl-j:down,ctrl-k:up,alt-j:down,alt-k:up --cycle
 zstyle ':fzf-tab:*' continuous-trigger '/'
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 if (( $+commands[ftb-tmux-popup] )); then
   zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 fi
 
-if (( $+commands[eza] )); then
-  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --level=2 --icons --color=always $realpath | head -200'
+# preview logic:
+# - file/dir completions => tree or file preview
+# - option/subcommand completions => selected completion description in preview pane
+zstyle ':fzf-tab:*' fzf-preview '
+  if [[ -n "$realpath" && -d "$realpath" ]]; then
+    if command -v eza >/dev/null 2>&1; then
+      eza --tree --level=2 --icons --color=always "$realpath" | head -200
+    else
+      ls -la "$realpath"
+    fi
+  elif [[ -n "$realpath" && -f "$realpath" ]]; then
+    if command -v bat >/dev/null 2>&1; then
+      bat --style=numbers --color=always --line-range :300 "$realpath"
+    else
+      sed -n "1,200p" "$realpath"
+    fi
+  else
+    print -P "%F{81}${group:-completion}%f"
+    [[ -n "$word" ]] && print -P "%B$word%b"
+    [[ -n "$desc" ]] && print -r -- "$desc"
+  fi
+'
+# -----------------------------------------------------------------------------
+# AI terminal workflow: shell plugins + richer completion UI
+# -----------------------------------------------------------------------------
+
+# jump to git repo root
+zinit ice depth=1
+zinit light mollifier/cd-gitroot
+
+# clipboard bridge
+zinit ice depth=1
+zinit light zpm-zsh/clipboard
+
+# vim-style registers in shell
+zinit ice depth=1
+zinit light zsh-vi-more/evil-registers
+
+# notify when long commands finish
+zinit ice depth=1
+zinit light MichaelAquilina/zsh-auto-notify
+
+# faster syntax highlighting
+# УБЕРИТЕ zsh-users/zsh-syntax-highlighting, если он уже подключен,
+# и используйте только fast-syntax-highlighting
+zinit ice depth=1
+zinit light zdharma-continuum/fast-syntax-highlighting
+
+
+if command -v carapace >/dev/null 2>&1; then
+  source <(carapace _carapace)
 fi
-if (( $+commands[eza] && $+commands[bat] )); then
-  zstyle ':fzf-tab:complete:*:*' fzf-preview '[[ -d $realpath ]] && eza --tree --level=2 --icons --color=always $realpath | head -200 || bat --style=numbers --color=always --line-range :300 $realpath'
-elif (( $+commands[bat] )); then
-  zstyle ':fzf-tab:complete:*:*' fzf-preview '[[ -d $realpath ]] && ls -la $realpath || bat --style=numbers --color=always --line-range :300 $realpath'
-fi
+
+# -----------------------------------------------------------------------------
+# Удобные алиасы под root repo
+# -----------------------------------------------------------------------------
+
+alias cdu='cd-gitroot'
 
 # -----------------------------------------------------------------------------
 # EXTERNAL TOOLS INIT (guarded)
@@ -262,6 +307,8 @@ fi
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 (( $+commands[thefuck] )) && eval "$(thefuck --alias fuck)"
 (( $+commands[starship] )) && eval "$(starship init zsh)"
+(( $+commands[direnv] )) && eval "$(direnv hook zsh)"
+(( $+commands[just] )) && source <(just --completions zsh 2>/dev/null)
 
 # history substring search
 bindkey -M viins "$terminfo[kcuu1]" history-substring-search-up
@@ -280,17 +327,54 @@ bindkey -M viins '^N' history-substring-search-down
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 
-
 # -----------------------------------------------------------------------------
 # FUNCTIONS
 # -----------------------------------------------------------------------------
-# Yazi cwd jump (existing, kept)
+# Yazi cwd jump (kept)
 function y() {
   local tmp="$(mktemp -t 'yazi-cwd.XXXXXX')" cwd
   yazi "$@" --cwd-file="$tmp"
   IFS= read -r -d '' cwd < "$tmp"
   [[ -n "$cwd" && "$cwd" != "$PWD" ]] && builtin cd -- "$cwd"
   rm -f -- "$tmp"
+}
+
+function _repo_root() {
+  git rev-parse --show-toplevel 2>/dev/null || print -r -- "$PWD"
+}
+
+function croot() {
+  cd "$(_repo_root)" || return
+}
+
+function _preview_file_or_tree() {
+  local target="$1"
+  if [[ -d "$target" ]]; then
+    if (( $+commands[eza] )); then
+      eza --tree --level=2 --icons --color=always "$target" | head -200
+    else
+      ls -la "$target"
+    fi
+  else
+    if (( $+commands[bat] )); then
+      bat --style=numbers --color=always --line-range :300 "$target"
+    else
+      sed -n '1,200p' "$target"
+    fi
+  fi
+}
+
+function _open_in_editor() {
+  (( $# )) || return 1
+
+  if [[ -n "$TMUX" ]] && (( $+commands[ton] )); then
+    local target
+    for target in "$@"; do
+      ton "$target"
+    done
+  else
+    nvim "$@"
+  fi
 }
 
 # fuzzy dir sources: zoxide first, then filesystem scan
@@ -319,21 +403,173 @@ function zz() {
   cd "$dir" || return
 }
 
-# quick edit current dir in nvim
-function nv() {
-  nvim "${1:-.}"
-}
-
-# tmux project entry using zoxide/sessionx friendly directories
-function tproj() {
+# project picker: cd in plain shell, enter/create session when outside tmux
+function p() {
   local dir name
   if (( $+commands[zoxide] )); then
     dir=$(zoxide query -l | fzf --prompt='project > ' --height=60% --preview 'eza --tree --level=2 --icons --color=always {} | head -200') || return
   else
     dir=$(fd --type d --hidden --follow --exclude .git . "$HOME" 2>/dev/null | fzf --prompt='project > ' --height=60% --preview 'eza --tree --level=2 --icons --color=always {} | head -200') || return
   fi
-  name=$(basename "$dir" | tr '.:' '__')
-  tmux new-session -A -s "$name" -c "$dir"
+
+  if [[ -n "$TMUX" ]]; then
+    cd "$dir" || return
+  else
+    name=$(basename "$dir" | tr '.:' '__')
+    tmux new-session -A -s "$name" -c "$dir"
+  fi
+}
+
+# backward-compatible name
+function tproj() {
+  p "$@"
+}
+
+# quick edit current dir in nvim
+function nv() {
+  nvim "${1:-.}"
+}
+
+# fast file finder rooted in current repo if possible
+function ffv() {
+  local root file
+  root="$(_repo_root)"
+  file=$(fd --type f --hidden --follow --exclude .git . "$root" 2>/dev/null | \
+    fzf --prompt='file > ' \
+        --preview 'if [ -d {} ]; then eza --tree --level=2 --icons --color=always {} | head -200; elif command -v bat >/dev/null 2>&1; then bat --style=numbers --color=always --line-range :300 {}; else sed -n "1,200p" {}; fi') || return
+  [[ -n "$file" ]] || return
+  _open_in_editor "$file"
+}
+
+# ripgrep + fzf + open result in editor at line
+function rgv() {
+  local root query selected file line
+  root="$(_repo_root)"
+  query="$*"
+
+  if [[ -n "$query" ]]; then
+    selected=$(rg --line-number --no-heading --smart-case --hidden --glob '!.git' -- "$query" "$root" 2>/dev/null | \
+      fzf --ansi --delimiter : --preview 'file=$(echo {} | cut -d: -f1); line=$(echo {} | cut -d: -f2); if command -v bat >/dev/null 2>&1; then bat --style=numbers --color=always --highlight-line "$line" --line-range "$(( line > 40 ? line - 40 : 1 )):$(( line + 80 ))" "$file"; else sed -n "1,200p" "$file"; fi') || return
+  else
+    selected=$(rg --line-number --no-heading --smart-case --hidden --glob '!.git' -- '.' "$root" 2>/dev/null | \
+      fzf --ansi --delimiter : --disabled --query '' --prompt='rg > ' \
+          --bind 'change:reload:rg --line-number --no-heading --smart-case --hidden --glob "!.git" -- {q} "'"$root"'" 2>/dev/null || true' \
+          --preview 'file=$(echo {} | cut -d: -f1); line=$(echo {} | cut -d: -f2); if command -v bat >/dev/null 2>&1; then bat --style=numbers --color=always --highlight-line "$line" --line-range "$(( line > 40 ? line - 40 : 1 )):$(( line + 80 ))" "$file"; else sed -n "1,200p" "$file"; fi') || return
+  fi
+
+  file=${selected%%:*}
+  line=${${selected#*:}%%:*}
+  [[ -n "$file" && -n "$line" ]] || return
+  _open_in_editor "$file:$line"
+}
+
+# ★ agent-diff: show ONLY what changed since last commit (what the agent did)
+function adiff() {
+  local root
+  root=$(groot) || return 1
+  if (( $+commands[delta] )); then
+    git -C "$root" diff --color=always | delta --paging=always --side-by-side
+  else
+    git -C "$root" diff --color=always | less -R
+  fi
+}
+
+# ★ agent-review: pick changed files, see side-by-side diff, open to edit
+function areview() {
+  local root
+  root=$(groot) || return 1
+  local count=$(git -C "$root" status --porcelain | wc -l | tr -d ' ')
+  print -P "%F{cyan}═══ Agent Review: $count changed files ═══%f"
+  git -C "$root" diff --stat --color=always
+  print ""
+  gchangedv
+}
+
+# ★ agent-accept: stage + commit everything (after reviewing agent's work)
+function aaccept() {
+  local root msg
+  root=$(groot) || return 1
+  msg="${*:-agent: apply changes}"
+  git -C "$root" add -A
+  git -C "$root" commit -m "$msg"
+  print -P "%F{green}✓ Committed: $msg%f"
+}
+
+# ★ agent-reject: discard all unstaged changes
+function areject() {
+  local root
+  root=$(groot) || return 1
+  print -P "%F{red}⚠ This will discard ALL uncommitted changes.%f"
+  read -q "confirm?Are you sure? (y/N) " || { print ""; return }
+  print ""
+  git -C "$root" checkout -- .
+  git -C "$root" clean -fd
+  print -P "%F{yellow}✗ Changes discarded%f"
+}
+
+function groot() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    print -u2 'not inside a git repository'
+    return 1
+  }
+  print -r -- "$root"
+}
+
+function gcd() {
+  cd "$(groot)" || return
+}
+
+function gchanged() {
+  local root line path
+  root=$(groot) || return 1
+
+  git -C "$root" status --porcelain=v1 --untracked-files=all | while IFS= read -r line; do
+    path=${line#?? }
+    if [[ "$path" == *' -> '* ]]; then
+      print -r -- "${path##* -> }"
+    else
+      print -r -- "$path"
+    fi
+  done | awk 'NF && !seen[$0]++'
+}
+
+function gchangedf() {
+  local root
+  root=$(groot) || return 1
+
+  gchanged | fzf -m \
+    --prompt='changed > ' \
+    --preview-window=right,65%,wrap \
+    --preview "root=${(q)root}; file={}; if git -C \"\$root\" diff --quiet -- \"\$file\" 2>/dev/null; then if [ -f \"\$root/\$file\" ]; then if command -v bat >/dev/null 2>&1; then bat --style=numbers --color=always --line-range :300 \"\$root/\$file\"; else sed -n '1,200p' \"\$root/\$file\"; fi; fi; else if command -v delta >/dev/null 2>&1; then git -C \"\$root\" diff --color=always -- \"\$file\" | delta --paging=never; else git -C \"\$root\" diff --color=always -- \"\$file\"; fi; fi"
+}
+
+function gchangedv() {
+  local root raw
+  local -a files absfiles
+  root=$(groot) || return 1
+  raw=$(gchangedf) || return
+  files=("${(@f)raw}")
+  (( ${#files[@]} )) || return
+
+  for file in "${files[@]}"; do
+    absfiles+=("$root/$file")
+  done
+
+  _open_in_editor "${absfiles[@]}"
+}
+
+function gdiffv() {
+  local root file
+  root=$(groot) || return 1
+  file=$(gchangedf | head -n 1) || return
+  [[ -n "$file" ]] || return
+
+  if (( $+commands[delta] )); then
+    git -C "$root" diff --color=always -- "$file" | delta --paging=always
+  else
+    git -C "$root" diff --color=always -- "$file" | less -R
+  fi
 }
 
 # tmux-which-key from zsh vicmd mode (leader-like <Space>)
