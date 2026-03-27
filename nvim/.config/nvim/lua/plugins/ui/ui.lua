@@ -10,14 +10,6 @@ return {
 			require("lualine").setup({ options = { theme = "auto", icons_enabled = true } })
 		end,
 	},
-	-- Дерево файлов
-	{
-		"nvim-tree/nvim-tree.lua",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-		config = function()
-			require("nvim-tree").setup({})
-		end,
-	},
 	-- Линии отступов
 	-- Подсветка цветов
 	{ "norcalli/nvim-colorizer.lua", opts = {} },
@@ -38,8 +30,12 @@ return {
 	{
 		"folke/which-key.nvim",
 		event = "VeryLazy",
-		config = function()
-			require("which-key").setup({})
+		opts = function()
+			return require("config.move_and_navigation.which-key").opts
+		end,
+		config = function(_, opts)
+			require("which-key").setup(opts)
+			require("config.move_and_navigation.which-key").register()
 		end,
 	},
 	{
@@ -68,7 +64,7 @@ return {
 			local dashboard = require("alpha.themes.dashboard")
 
 			-- Устанавливаем ASCII-арт для заголовка
-			dashboard.section.header.val = {
+				dashboard.section.header.val = {
 				[[ ┌─────────────────────────────────────────────────────────────────┐ ]],
 				[[ │                     \`-._           __                          │ ]],
 				[[ │                      \\  \-..____,.'  `.                        │ ]],
@@ -100,54 +96,27 @@ return {
 				[[         ██╔████╔██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║         ]],
 				[[         ██║╚██╔╝██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║         ]],
 				[[         ██║ ╚═╝ ██║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║         ]],
-				[[         ╚═╝     ╚═╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝         ]],
-			}
+					[[         ╚═╝     ╚═╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝         ]],
+				}
 
-			-- Получаем путь к папке с конфигурацией
-			local config_path = vim.fn.stdpath("config")
-			-- Эта функция будет отвечать за логику переключения
-			local function toggle_telescope_harpoon()
-				-- Получаем текущий открытый пикер Telescope
-				local picker = require("telescope.actions.state").get_current_picker()
+				local config_path = vim.fn.stdpath("config")
 
-				-- Если пикер Telescope уже открыт, мы его закрываем
-				if picker then
-					require("telescope.actions").close()
-					return
-				end
+				dashboard.section.buttons.val = {
+					dashboard.button("o", "  Недавние файлы", ":Telescope oldfiles <CR>"),
+					dashboard.button("p", "  Заметки", ":HarpoonTelescope <CR>"),
+					dashboard.button("g", "  Найти по тексту", ":Telescope live_grep <CR>"),
+					dashboard.button(
+						"c",
+						"  Файлы конфига",
+						":Telescope find_files cwd=" .. config_path .. " <CR>"
+					),
+					dashboard.button("q", "  Выход", ":qa <CR>"),
+				}
 
-				-- Если пикер не открыт, мы создаем новый со списком из Harpoon
-				-- и показываем его
-				require("move_and_navigation.telescope").extensions.harpoon.marks()
-			end
-
-			-- Создаем пользовательскую команду :ToggleHarpoon
-			vim.api.nvim_create_user_command(
-				"ToggleHarpoon",
-				toggle_telescope_harpoon,
-				{ desc = "Переключить Telescope для списка Harpoon" }
-			)
-
-			-- Настраиваем кнопки-меню
-			dashboard.section.buttons.val = {
-				-- Новая кнопка для файлов проекта
-				dashboard.button("o", "  Недавние файлы", ":Telescope oldfiles <CR>"),
-				dashboard.button("p", "  Заметки", ":ToggleHarpoon <CR>"),
-				-- Другие полезные кнопки
-				dashboard.button("g", "  Найти по тексту", ":Telescope live_grep <CR>"),
-				-- Новая кнопка для файлов конфигурации
-				dashboard.button(
-					"c",
-					"  Файлы конфига",
-					":Telescope find_files cwd=" .. config_path .. " <CR>"
-				),
-				dashboard.button("q", "  Выход", ":qa <CR>"),
-			}
-
-			-- Применяем тему dashboard
-			alpha.setup(dashboard.opts)
-		end,
-	},
+				-- Применяем тему dashboard
+				alpha.setup(dashboard.opts)
+			end,
+		},
 	---Название файла
 	{
 		"b0o/incline.nvim",
@@ -184,8 +153,8 @@ return {
 		"akinsho/bufferline.nvim",
 		event = "VeryLazy",
 		keys = {
-			{ "<Tab>", "<Cmd>BufferLineCycleNext<CR>", desc = "Next tab" },
-			{ "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", desc = "Prev tab" },
+			{ "<Tab>", "<Cmd>BufferLineCycleNext<CR>", desc = "Следующая вкладка" },
+			{ "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", desc = "Предыдущая вкладка" },
 		},
 		opts = {
 			options = {

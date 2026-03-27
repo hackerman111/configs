@@ -4,8 +4,7 @@ return {
 	lazy = true,
 	cmd = { "Outline", "OutlineOpen" },
 	keys = {
-		-- Горячая клавиша для открытия, полностью совместима с which-key
-		{ "<Leader>o", "<cmd>Outline<CR>", desc = "Структура документа" },
+		{ "<Leader>o", "<cmd>Outline<CR>", desc = "Outline: структура документа" },
 	},
 	opts = {
 		-- В этом плагине все настройки находятся внутри таблицы 'opts'

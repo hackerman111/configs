@@ -117,13 +117,12 @@ return {
 			},
 		})
 
-		-- Настройка горячих клавиш
-		local map = vim.keymap.set
-		local opts = { silent = true, noremap = true }
-		local telescope = require("telescope.builtin")
+			-- Настройка горячих клавиш
+			local map = vim.keymap.set
+			local opts = { silent = true, noremap = true }
 
-		map(
-			"n",
+			map(
+				"n",
 			"K",
 			"<cmd>Lspsaga hover_doc<CR>",
 			vim.tbl_extend("force", opts, { desc = "Показать документацию (Hover)" })
@@ -141,40 +140,33 @@ return {
 			vim.tbl_extend("force", opts, { desc = "Перейти к определению типа" })
 		)
 
-		map(
-			"n",
-			"[d",
-			"<cmd>Lspsaga diagnostic_jump_prev<CR>",
-			vim.tbl_extend("force", opts, { desc = "К предыдущей диагностике" })
-		)
-		map(
-			"n",
-			"]d",
-			"<cmd>Lspsaga diagnostic_jump_next<CR>",
-			vim.tbl_extend("force", opts, { desc = "К следующей диагностике" })
-		)
-		map(
-			"n",
-			"<leader>gD",
-			"<cmd>Lspsaga show_line_diagnostics<CR>",
-			vim.tbl_extend("force", opts, { desc = "Показать диагностику строки" })
-		)
+			map(
+				"n",
+				"[d",
+				"<cmd>Lspsaga diagnostic_jump_prev<CR>",
+				vim.tbl_extend("force", opts, { desc = "К предыдущей диагностике" })
+			)
+			map(
+				"n",
+				"]d",
+				"<cmd>Lspsaga diagnostic_jump_next<CR>",
+				vim.tbl_extend("force", opts, { desc = "К следующей диагностике" })
+			)
+			map("n", "<leader>gD", "<cmd>Lspsaga show_line_diagnostics<CR>", vim.tbl_extend("force", opts, {
+				desc = "Показать диагностику строки",
+			}))
 
-		map(
-			{ "n", "v" },
-			"<leader>ca",
-			"<cmd>Lspsaga code_action<CR>",
-			vim.tbl_extend("force", opts, { desc = "Действия с кодом (Code Action)" })
-		)
+			map(
+				{ "n", "v" },
+				"<leader>ca",
+				"<cmd>Lspsaga code_action<CR>",
+				vim.tbl_extend("force", opts, { desc = "Действия с кодом (Code Action)" })
+			)
+			map("n", "<leader>lo", "<cmd>Lspsaga outline<CR>", vim.tbl_extend("force", opts, {
+				desc = "Lspsaga: структура файла",
+			}))
 
-		map(
-			"n",
-			"<leader>o",
-			"<cmd>Lspsaga outline<CR>",
-			vim.tbl_extend("force", opts, { desc = "Структура файла (Outline)" })
-		)
-
-		-- Интеграция с notify для уведомлений
-		vim.notify = require("notify")
+			-- Интеграция с notify для уведомлений
+			vim.notify = require("notify")
 	end,
 }

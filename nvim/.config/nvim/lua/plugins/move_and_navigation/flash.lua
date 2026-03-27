@@ -36,19 +36,17 @@ return {
 				"s",
 				mode = { "n" },
 				function()
-					-- 's' запускает flash
 					require("flash").jump()
 				end,
-				desc = "Flash Jump",
+				desc = "Flash: быстрый прыжок",
 			},
 			{
 				"S",
 				mode = { "n", "x", "o" },
 				function()
-					-- 'S' запускает flash во всех окнах
 					require("flash").treesitter()
 				end,
-				desc = "Flash Treesitter",
+				desc = "Flash: Tree-sitter прыжок",
 			},
 			{
 				"r",
@@ -56,17 +54,16 @@ return {
 				function()
 					require("flash").remote()
 				end,
-				desc = "Flash Remote",
+				desc = "Flash: удаленная операция",
 			},
 			{
-				"<leader>l", -- Клавиша для вызова прыжка
+				"<leader>l",
 				mode = { "n" },
 				function()
-					-- ⚙️ Здесь мы используем вашу адаптированную функцию
 					require("flash").jump({
 						pattern = "^",
 						label = { after = { 0, 0 } },
-						search = { mode = "search" }, -- max_length можно убрать для ясности
+						search = { mode = "search" },
 					})
 				end,
 				desc = "Flash: прыжок в начало строки",

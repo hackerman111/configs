@@ -72,17 +72,16 @@ return {
 			"<Plug>(YankyPutBeforeFilter)",
 			desc = "Вставить перед применением фильтра",
 		},
-	},
-	config = function()
-		-- Я исправил структуру вызова setup (убрал лишнюю пару скобок)
-		require("yanky").setup({
-			ring = {
-				history_length = 100,
-				storage = "shada",
-				storage_path = vim.fn.stdpath("data") .. "/databases/yanky.db", -- Only for sqlite storage
-				sync_with_numbered_registers = true,
-				cancel_event = "update",
-				ignore_registers = { "_" },
+		},
+		config = function()
+			require("yanky").setup({
+				ring = {
+					history_length = 100,
+					storage = "shada",
+					storage_path = vim.fn.stdpath("data") .. "/databases/yanky.db", -- Only for sqlite storage
+					sync_with_numbered_registers = true,
+					cancel_event = "update",
+					ignore_registers = { "_" },
 				update_register_on_cycle = false,
 				permanent_wrapper = nil,
 			},
@@ -104,52 +103,12 @@ return {
 				on_yank = true,
 				timer = 500,
 			},
-			preserve_cursor_position = {
-				enabled = true,
-			},
-			textobj = {
-				enabled = false,
-			},
-		})
-
-		-- Примечание: Эти кеймапы уже определены в таблице `keys` выше и являются избыточными.
-		-- Я добавил к ним описания согласно вашему запросу.
-		vim.keymap.set(
-			{ "n", "x" },
-			"p",
-			"<Plug>(YankyPutAfter)",
-			{ desc = "Вставить после курсора" }
-		)
-		vim.keymap.set(
-			{ "n", "x" },
-			"P",
-			"<Plug>(YankyPutBefore)",
-			{ desc = "Вставить перед курсором" }
-		)
-		vim.keymap.set(
-			{ "n", "x" },
-			"gp",
-			"<Plug>(YankyGPutAfter)",
-			{ desc = "Вставить после выделения" }
-		)
-		vim.keymap.set(
-			{ "n", "x" },
-			"gP",
-			"<Plug>(YankyGPutBefore)",
-			{ desc = "Вставить перед выделением" }
-		)
-
-		vim.keymap.set(
-			"n",
-			"<c-p>",
-			"<Plug>(YankyPreviousEntry)",
-			{ desc = "Предыдущая запись в истории" }
-		)
-		vim.keymap.set(
-			"n",
-			"<c-n>",
-			"<Plug>(YankyNextEntry)",
-			{ desc = "Следующая запись в истории" }
-		)
-	end,
-}
+				preserve_cursor_position = {
+					enabled = true,
+				},
+				textobj = {
+					enabled = false,
+				},
+			})
+		end,
+	}

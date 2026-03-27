@@ -18,8 +18,8 @@ return {
 				replace_all = "<leader><cr>",
 			},
 		})
-		vim.keymap.set({ "n", "x" }, "<leader>sr", function()
-			require("ssr").open()
-		end)
-	end,
-}
+			vim.keymap.set({ "n", "x" }, "<leader>sr", function()
+				require("ssr").open()
+			end, { desc = "Структурная замена" })
+		end,
+	}

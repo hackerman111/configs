@@ -18,17 +18,17 @@ return {
 		{
 			"<leader>tt",
 			"<cmd>Trouble diagnostics toggle focus=true filter.buf=0<cr>",
-			desc = "trouble diagnostics",
+			desc = "Диагностика текущего файла",
 		},
 		{
 			"<leader>tT",
 			"<cmd>Trouble diagnostics toggle focus=true<cr>",
-			desc = "project diagnostics",
+			desc = "Диагностика проекта",
 		},
 		{
 			"<leader>ts",
 			"<cmd>Trouble symbols toggle focus=true<cr>",
-			desc = "symbols",
+			desc = "Символы текущего файла",
 		},
 	},
 }

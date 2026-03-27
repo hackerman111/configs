@@ -48,10 +48,10 @@ return {
 				},
 			},
 		})
-		require("move_and_navigation.telescope").load_extension("textcase")
+		require("telescope").load_extension("textcase")
 	end,
 	keys = {
 		"ga", -- Default invocation prefix
-		{ "ga.", "<cmd>TextCaseOpenTelescope<CR>", mode = { "n", "x" }, desc = "Telescope" },
+		{ "ga.", "<cmd>TextCaseOpenTelescope<CR>", mode = { "n", "x" }, desc = "Выбрать регистр через Telescope" },
 	},
 }

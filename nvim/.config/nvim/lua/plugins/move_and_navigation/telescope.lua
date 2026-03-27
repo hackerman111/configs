@@ -154,7 +154,7 @@ return {
 			telescope.load_extension("repo")
 
 			-- ВАШИ КЕЙМАПЫ
-			vim.keymap.set("n", "<space>fd", function()
+			vim.keymap.set("n", "<leader>fd", function()
 				require("telescope").extensions.file_browser.file_browser()
 			end, { desc = "Открыть файловый браузер" })
 			vim.keymap.set("n", "<leader>ff", function()

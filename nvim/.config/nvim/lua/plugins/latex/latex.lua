@@ -34,9 +34,9 @@ return {
             vim.g.vimtex_delim_toggle_mod_list = { { "\\left", "\\right" }, { "\\big", "\\big" } }
 
             -- Горячая клавиша для компиляции
-            vim.keymap.set("n", "<leader>LL", "<cmd>VimtexCompile<CR>", { desc = "Compile LaTeX" })
-        end,
-    },
+	            vim.keymap.set("n", "<leader>LL", "<cmd>VimtexCompile<CR>", { desc = "Собрать LaTeX-документ" })
+	        end,
+	    },
     -- Сниппеты
     {
         "L3MON4D3/LuaSnip",
