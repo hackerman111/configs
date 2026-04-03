@@ -231,37 +231,24 @@ export YSU_MODE='ALL'
 export FORGIT_FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS"
 
 # fzf-tab
-zstyle ':fzf-tab:*' switch-group '<' '>'
-zstyle ':fzf-tab:*' fzf-bindings 'tab:accept' 'ctrl-space:toggle+down'
-zstyle ':fzf-tab:*' fzf-flags --with-nth=2 --bind=tab:accept,ctrl-j:down,ctrl-k:up,alt-j:down,alt-k:up --cycle
-zstyle ':fzf-tab:*' continuous-trigger '/'
-zstyle ':fzf-tab:*' use-fzf-default-opts yes
-if (( $+commands[ftb-tmux-popup] )); then
-  zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-fi
+# =============================================================================
+# zsh-vi-mode hook — перепривязываем Tab ПОСЛЕ того как ZVM перезапишет биндинги
+# =============================================================================
+function zvm_after_init() {
+  bindkey '^I' fzf-tab-complete
+  (( $+commands[fzf] )) && {
+    bindkey '^T' fzf-file-widget
+    bindkey '^R' fzf-history-widget
+    bindkey '^[c' fzf-cd-widget
+  }
+  bindkey -M viins "$terminfo[kcuu1]" history-substring-search-up
+  bindkey -M viins "$terminfo[kcud1]" history-substring-search-down
+  bindkey -M viins '^[[A' history-substring-search-up
+  bindkey -M viins '^[[B' history-substring-search-down
+  bindkey -M viins '^P' history-substring-search-up
+  bindkey -M viins '^N' history-substring-search-down
+}
 
-# preview logic:
-# - file/dir completions => tree or file preview
-# - option/subcommand completions => selected completion description in preview pane
-zstyle ':fzf-tab:*' fzf-preview '
-  if [[ -n "$realpath" && -d "$realpath" ]]; then
-    if command -v eza >/dev/null 2>&1; then
-      eza --tree --level=2 --icons --color=always "$realpath" | head -200
-    else
-      ls -la "$realpath"
-    fi
-  elif [[ -n "$realpath" && -f "$realpath" ]]; then
-    if command -v bat >/dev/null 2>&1; then
-      bat --style=numbers --color=always --line-range :300 "$realpath"
-    else
-      sed -n "1,200p" "$realpath"
-    fi
-  else
-    print -P "%F{81}${group:-completion}%f"
-    [[ -n "$word" ]] && print -P "%B$word%b"
-    [[ -n "$desc" ]] && print -r -- "$desc"
-  fi
-'
 # -----------------------------------------------------------------------------
 # AI terminal workflow: shell plugins + richer completion UI
 # -----------------------------------------------------------------------------
@@ -278,9 +265,6 @@ zinit light zpm-zsh/clipboard
 zinit ice depth=1
 zinit light zsh-vi-more/evil-registers
 
-# notify when long commands finish
-zinit ice depth=1
-zinit light MichaelAquilina/zsh-auto-notify
 
 # faster syntax highlighting
 # УБЕРИТЕ zsh-users/zsh-syntax-highlighting, если он уже подключен,
@@ -440,6 +424,174 @@ function ffv() {
   [[ -n "$file" ]] || return
   _open_in_editor "$file"
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ff — recent files fuzzy picker  (аналог zz, но для файлов)
+#
+# Три источника в порядке приоритета (дедуплицируются):
+#   1. git-изменённые файлы текущего репо (самые свежие для агента)
+#   2. fd --changed-within 7d  (файлы, изменённые за последние 7 дней)
+#   3. fallback: fd --type f в текущем репо/директории
+#
+# Использование:
+#   ff           — интерактивный fzf-пикер, открывает в nvim / ton (если tmux)
+#   ff <query>   — предзаполнить строку поиска
+#
+# Флаги:
+#   --days N     — глубина поиска fd (по умолчанию 7)
+#   --root DIR   — корень поиска (по умолчанию: git root или $PWD)
+#   --print      — только вывести пути, не открывать редактор
+#
+# Зависимости: fd, fzf, bat (опционально), eza (опционально)
+#              nvim + ton (tmux-open-nvim) — как у тебя в конфиге
+# ─────────────────────────────────────────────────────────────────────────────
+
+function ff() {
+  # ── parse args ────────────────────────────────────────────────────────────
+  local -i days=7
+  local root query print_only=0
+  local -a leftover
+
+  while (( $# )); do
+    case "$1" in
+      --days)   days="${2:?'--days requires a value'}"; shift 2 ;;
+      --root)   root="${2:?'--root requires a value'}"; shift 2 ;;
+      --print)  print_only=1; shift ;;
+      --)       shift; leftover+=("$@"); break ;;
+      -*)       print -u2 "ff: unknown flag $1"; return 1 ;;
+      *)        leftover+=("$1"); shift ;;
+    esac
+  done
+
+  query="${leftover[*]}"
+  [[ -z "$root" ]] && root="$(_repo_root)"   # fallback: git root or PWD
+
+  # ── build candidate list ──────────────────────────────────────────────────
+  # Source 1: git-changed files (absolute paths) — most relevant for AI agent
+  local -a git_files=()
+  if git -C "$root" rev-parse --is-inside-work-tree &>/dev/null; then
+    while IFS= read -r rel; do
+      [[ -f "$root/$rel" ]] && git_files+=("$root/$rel")
+    done < <(
+      git -C "$root" status --porcelain=v1 --untracked-files=all 2>/dev/null \
+        | while IFS= read -r line; do
+            local p="${line#?? }"
+            [[ "$p" == *' -> '* ]] && p="${p##* -> }"
+            print -r -- "$p"
+          done
+    )
+  fi
+
+  # Source 2: recently modified files via fd
+  local -a fd_files=()
+  if (( $+commands[fd] )); then
+    while IFS= read -r f; do
+      fd_files+=("$f")
+    done < <(
+      fd --type f --hidden --follow \
+         --exclude .git --exclude node_modules --exclude __pycache__ \
+         --exclude '.DS_Store' \
+         --changed-within "${days}d" \
+         --absolute-path \
+         . "$root" 2>/dev/null \
+        | sort -t/ -k1,1  # fd doesn't guarantee mtime order; we sort after
+    )
+  fi
+
+  # Source 3: fallback — any file in the repo/dir (when sources 1+2 are empty)
+  local -a fallback_files=()
+  if (( ${#git_files[@]} + ${#fd_files[@]} == 0 )); then
+    while IFS= read -r f; do
+      fallback_files+=("$f")
+    done < <(
+      fd --type f --hidden --follow \
+         --exclude .git --exclude node_modules \
+         --absolute-path \
+         . "$root" 2>/dev/null | head -500
+    )
+  fi
+
+  # Merge & deduplicate, preserving priority order (git > fd > fallback)
+  local -a candidates=()
+  local -A seen=()
+  for f in "${git_files[@]}" "${fd_files[@]}" "${fallback_files[@]}"; do
+    [[ -z "${seen[$f]}" ]] || continue
+    seen[$f]=1
+    candidates+=("$f")
+  done
+
+  if (( ${#candidates[@]} == 0 )); then
+    print -P "%F{yellow}ff: no files found in $root%f"
+    return 1
+  fi
+
+  # ── fzf preview command (bat with fallback) ───────────────────────────────
+  local preview_cmd
+  if (( $+commands[bat] )); then
+    preview_cmd='bat --style=numbers --color=always --line-range :300 {}'
+  else
+    preview_cmd='sed -n "1,200p" {}'
+  fi
+
+  # ── label for git-changed files (shown as relative paths in fzf) ─────────
+  # We display relative paths for readability, but remember absolutes for open.
+  # Build a display→absolute map via NUL-separated pairs fed to fzf --read0.
+
+  # Simpler approach: display relative-to-root, pass absolute via fzf transform
+  local -a display=()
+  for f in "${candidates[@]}"; do
+    # strip root prefix for display; keep absolute for opening
+    display+=("${f#$root/}")
+  done
+
+  # ── run fzf ──────────────────────────────────────────────────────────────
+  local raw
+  raw=$(
+    printf '%s\n' "${display[@]}" | fzf \
+      --multi \
+      --prompt='recent > ' \
+      --query="$query" \
+      --preview="$preview_cmd" \
+      --preview-window='right,65%,wrap' \
+      --bind='ctrl-j:down,ctrl-k:up,alt-j:down,alt-k:up' \
+      --bind='ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down' \
+      --bind='ctrl-f:preview-page-down,ctrl-b:preview-page-up' \
+      --cycle \
+      --header="$(printf '%d files | root: %s | last %dd' ${#candidates[@]} "${root/#$HOME/~}" $days)"
+  ) || return
+
+  # ── resolve selected display lines back to absolute paths ─────────────────
+  local -a selected=()
+  while IFS= read -r rel; do
+    [[ -z "$rel" ]] && continue
+    local abs="$root/$rel"
+    # handle files that were already absolute (from outside root)
+    [[ -f "$abs" ]] && selected+=("$abs") || selected+=("$rel")
+  done <<< "$raw"
+
+  (( ${#selected[@]} )) || return
+
+  # ── output ────────────────────────────────────────────────────────────────
+  if (( print_only )); then
+    printf '%s\n' "${selected[@]}"
+    return
+  fi
+
+  _open_in_editor "${selected[@]}"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Suggested additions to your .zshrc:
+#
+#   # open recent files (mirrors 'zz' for directories)
+#   # ff            — picks from git-changed + fd-recent files
+#   # ff some text  — pre-fills fzf query
+#   # ff --days 14  — widen time window
+#   # ff --print    — print paths (useful for pipes / agent scripts)
+#
+# The function uses _repo_root and _open_in_editor already defined in your
+# config, so just append this block after those definitions.
+# ─────────────────────────────────────────────────────────────────────────────
 
 # ripgrep + fzf + open result in editor at line
 function rgv() {

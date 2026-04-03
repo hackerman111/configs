@@ -244,7 +244,11 @@ snippets.structure = {
         { t("\\section{"), i(1, "Заголовок раздела"), t("}") },
         { condition = conds.line_begin }
     ),
-
+    s(
+        { trig = "Sec", name = "Section", dscr = "Create a new section", snippetType = "autosnippet" },
+        { t("\\section*{"), i(1, "Заголовок раздела"), t("}") },
+        { condition = conds.line_begin }
+    ),
     -- Subsection + optional paragraph
     s({ trig = "sbec", name = "Subsection", dscr = "Create a new subsection" }, {
         t("\\subsection{"),
@@ -525,7 +529,10 @@ snippets.general_math = {
         { trig = "ras", name = "Right Squiggly Arrow", wordTrig = true, snippetType = "autosnippet" },
         t("\\rightsquigarrow")
     ),
-    s({ trig = "par", name = "Partial", wordTrig = true, snippetType = "autosnippet" }, t("\\partial")),
+    --s({ trig = "par", name = "Partial", wordTrig = true, snippetType = "autosnippet" }, t("\\partial")),
+    s({ trig = "par", name = "Partial conc", wordTrig = true, snippetType = "autosnippet" },
+        { t("\\partial_{"), i(1, " "),
+            t("}"), i(2) }),
     s({ trig = ";in", name = "Infinity", snippetType = "autosnippet" }, t("\\infty")),
     s({ trig = "spec", name = "Spectr", snippetType = "autosnippet" }, t("\\mathrm{Spec}")),
 }
@@ -977,10 +984,6 @@ snippets.misc = {
 snippets.coursework = {
     -- 1. Скобка Ли [u, v]
     -- Пример: [u, v]
-    s({ trig = "lie", dscr = "Lie bracket" }, {
-        t("["), i(1, "u"), t(", "), i(2, "v"), t("]")
-    }),
-
     -- 2. Оператор дифференцирования по переменной
     -- Пример: \frac{\partial}{\partial z_n}
     s({ trig = "pd", dscr = "Partial derivative operator" }, {
@@ -1000,6 +1003,10 @@ snippets.coursework = {
     -- 4. Оператор Der (Алгебра дифференцирований)
     s({ trig = "Aut", dscr = "Autmorphism algebra operator" }, {
         t("\\operatorname{Aut}")
+    }),
+    s({ trig = "ad", dscr = "n times lie bracket", snippetType = "autosnippet" }, {
+        t("\\operatorname{ad}_{"), i(1, "x"),
+        t("}^{"), i(2), t("}"), i(3)
     }),
 
     -- 5. Кольцо полиномов

@@ -165,8 +165,5 @@ return {
 			map("n", "<leader>lo", "<cmd>Lspsaga outline<CR>", vim.tbl_extend("force", opts, {
 				desc = "Lspsaga: структура файла",
 			}))
-
-			-- Интеграция с notify для уведомлений
-			vim.notify = require("notify")
 	end,
 }
