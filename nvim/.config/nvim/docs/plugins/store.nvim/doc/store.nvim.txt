@@ -1,0 +1,177 @@
+*store.nvim.txt*           For NVIM v0.8.0          Last change: 2026 March 06
+
+==============================================================================
+Table of Contents                               *store.nvim-table-of-contents*
+
+1. store.nvim                                          |store.nvim-store.nvim|
+  - Installation                          |store.nvim-store.nvim-installation|
+  - Usage                                        |store.nvim-store.nvim-usage|
+  - Default Configuration        |store.nvim-store.nvim-default-configuration|
+  - API                                            |store.nvim-store.nvim-api|
+  - Filtering                                |store.nvim-store.nvim-filtering|
+
+==============================================================================
+1. store.nvim                                          *store.nvim-store.nvim*
+
+
+INSTALLATION                              *store.nvim-store.nvim-installation*
+
+>lua
+    {
+      "alex-popov-tech/store.nvim",
+      dependencies = { "OXY2DEV/markview.nvim" },
+      cmd = "Store",
+      keys = {
+        { "<leader>s", "<cmd>Store<cr>", desc = "Open Plugin Store" },
+      },
+      opts = {
+        -- optional configuration here
+      }
+    }
+<
+
+
+USAGE                                            *store.nvim-store.nvim-usage*
+
+Open the with:
+
+- **Command**: `:Store`
+- **Lua API**: `require("store").open()`
+
+
+DEFAULT CONFIGURATION            *store.nvim-store.nvim-default-configuration*
+
+>lua
+    require("store").setup({
+      -- Main window dimensions
+      width = 0.8, -- 80% of screen width
+      height = 0.8, -- 80% of screen height
+    
+      -- Window layout proportions (must sum to 1.0)
+      proportions = {
+        list = 0.5,
+        preview = 0.5,
+      },
+    
+      -- Keybindings configuration
+      keybindings = {
+        help = { "?" },
+        close = { "q", "<esc>", "<c-c>" },
+        filter = { "f" },
+        reset = { "r" },
+        open = { "<cr>", "o" },
+        switch_focus = { "<tab>", "<s-tab>" },
+        sort = { "s" },
+        install = { "i" },
+        hover = { "K" },
+      },
+    
+      -- Behavior
+      preview_debounce = 100, -- ms delay for preview updates
+      cache_duration = 24 * 60 * 60, -- 24 hours
+      data_source_url = "https://gist.githubusercontent.com/alex-popov-tech/dfb6adf1ee0506461d7dc029a28f851d/raw/db_minified.json", -- URL for plugin data
+      plugin_manager = "not-selected", -- Force manager detection ("lazy.nvim" or "vim.pack")
+    
+      -- Logging
+      logging = "off",
+    
+      -- List display settings (using function-based renderer)
+      repository_renderer = function(repo, isInstalled)
+        return {
+          {
+            content = isInstalled and "🏠" or "📦",
+            limit = 2,
+          },
+          {
+            content = "⭐" .. repo.pretty.stars,
+            limit = 10,
+          },
+          {
+            content = repo.full_name,
+            limit = 35,
+          },
+          {
+            content = "Updated " .. repo.pretty.updated_at,
+            limit = 25,
+          },
+          {
+            content = repo.tags and table.concat(repo.tags, ", ") or "",
+            limit = 30,
+          },
+        }
+      end, -- Function to render repository data for list display
+    
+      -- Z-index configuration for modal layers
+      zindex = {
+        base = 10, -- Base modal components (heading, list, preview)
+        backdrop = 15, -- Reserved for backdrop/dimming layer
+        popup = 20, -- Popup modals (help, sort, filter)
+      },
+    
+      -- Resize behavior
+      resize_debounce = 30, -- ms delay for resize debouncing (10-200ms range)
+    
+      -- Plugin installation folder (absolute path or starts with ~)
+      -- Defaults to ~/.config/nvim/lua/plugins if not specified
+      plugins_folder = nil, -- Example: "~/my-nvim-plugins" or "/opt/nvim/plugins"
+    
+      -- Telemetry (opt-out, sends anonymous usage counts)
+      telemetry = true, -- Tracks: plugin views and installs
+                        -- Privacy: IP hashed with daily rotating salt, no PII stored
+                        -- Public stats: GET https://store-nvim-telemetry.alex-popov-tech.workers.dev/stats
+                        -- Source: https://github.com/alex-popov-tech/store.nvim.telemetry
+    })
+<
+
+Set `plugin_manager = "lazy.nvim"` or `plugin_manager = "vim.pack"` to lock the
+installation modal to a specific manager. The default `"not-selected"` lets
+store.nvim probe both managers and pick whichever has data available.
+
+
+API                                                *store.nvim-store.nvim-api*
+
+
+FUNCTIONS ~
+
+
+REQUIRE("STORE").SETUP(CONFIG)
+
+Initialize the plugin with optional configuration.
+
+
+REQUIRE("STORE").OPEN()
+
+Open the store modal interface.
+
+
+COMMANDS ~
+
+
+:STORE
+
+Opens the store modal interface.
+
+
+FILTERING                                    *store.nvim-store.nvim-filtering*
+
+>
+    -- Basic search (searches author/name)
+    telescope
+    nvim-lua/plenary
+    
+    -- Field-specific searches
+    author:nvim-telescope
+    name:telescope
+    description:fuzzy finder
+    tags:lsp,completion
+    
+    -- Combined queries (all must match)
+    telescope;author:nvim-telescope;tags:fuzzy,finder
+    
+    -- Complex multi-field query
+    author:folke;tags:ui,colorscheme;
+<
+
+Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
+
+vim:tw=78:ts=8:noet:ft=help:norl:

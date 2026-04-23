@@ -1,0 +1,8 @@
+Picker.picker	telescope-egrepify.txt	/*Picker.picker*
+PickerConfig	telescope-egrepify.txt	/*PickerConfig*
+egrep_actions.toggle_and	telescope-egrepify.txt	/*egrep_actions.toggle_and*
+egrep_actions.toggle_permutations	telescope-egrepify.txt	/*egrep_actions.toggle_permutations*
+egrep_actions.toggle_prefixes	telescope-egrepify.txt	/*egrep_actions.toggle_prefixes*
+telescope-egrepify.actions	telescope-egrepify.txt	/*telescope-egrepify.actions*
+telescope-egrepify.nvim	telescope-egrepify.txt	/*telescope-egrepify.nvim*
+telescope-egrepify.picker	telescope-egrepify.txt	/*telescope-egrepify.picker*

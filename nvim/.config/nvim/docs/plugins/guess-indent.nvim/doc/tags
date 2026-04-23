@@ -1,0 +1,8 @@
+:GuessIndent	guess_indent.txt	/*:GuessIndent*
+GuessIndent	guess_indent.txt	/*GuessIndent*
+GuessIndent-commands	guess_indent.txt	/*GuessIndent-commands*
+GuessIndent-introduction	guess_indent.txt	/*GuessIndent-introduction*
+GuessIndent-license	guess_indent.txt	/*GuessIndent-license*
+GuessIndent-options	guess_indent.txt	/*GuessIndent-options*
+GuessIndent-setup	guess_indent.txt	/*GuessIndent-setup*
+guess_indent.txt	guess_indent.txt	/*guess_indent.txt*
