@@ -3,6 +3,10 @@ local map = vim.keymap.set
 map("n", "<esc>", "<cmd>nohlsearch<CR>", { desc = "Сбросить подсветку поиска" })
 map("n", "yy", '"+Y', { desc = "Скопировать строку в системный буфер" })
 
+map("n", "<Left>", '<cmd>echo "Используйте h для движения влево"<CR>', { silent = true, desc = "Подсказка: h" })
+map("n", "<Right>", '<cmd>echo "Используйте l для движения вправо"<CR>', { silent = true, desc = "Подсказка: l" })
+map("n", "<Up>", '<cmd>echo "Используйте k для движения вверх"<CR>', { silent = true, desc = "Подсказка: k" })
+map("n", "<Down>", '<cmd>echo "Используйте j для движения вниз"<CR>', { silent = true, desc = "Подсказка: j" })
 
 map("n", "<leader>wh", "<C-w>h", { desc = "Окно слева" })
 map("n", "<leader>wj", "<C-w>j", { desc = "Окно снизу" })

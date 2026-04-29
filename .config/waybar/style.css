@@ -41,6 +41,8 @@ tooltip label {
 #workspaces,
 #window,
 #custom-temperature,
+#custom-gpu-temp,
+#custom-gpu-vram,
 #memory,
 #cpu,
 #idle_inhibitor,
@@ -65,7 +67,9 @@ tooltip label {
 #custom-left5,
 #custom-left6,
 #custom-left7,
-#custom-left8 {
+#custom-left8,
+#custom-left9,
+#custom-left10 {
   margin-bottom: 0;
   text-shadow: -2px 0 2px rgba(0, 0, 0, 0.5);
 }
@@ -184,8 +188,47 @@ tooltip label {
   background: @cpu;
 }
 
+/* ────────────────────────────────────────────────────────────────┤ gpu ├───
+*/
+#custom-left9 {
+  color: @memory;
+  background: @cpu;
+  padding-left: 3px;
+}
+
+#custom-gpu-temp {
+  background: @memory;
+}
+
+#custom-gpu-temp.warning {
+  color: @warning;
+}
+
+#custom-gpu-temp.critical {
+  color: @critical;
+}
+
+#custom-left10 {
+  color: @temperature;
+  background: @memory;
+  padding-left: 3px;
+}
+
+#custom-gpu-vram {
+  background: @temperature;
+  padding-right: 6px;
+}
+
+#custom-gpu-vram.warning {
+  color: @warning;
+}
+
+#custom-gpu-vram.critical {
+  color: @critical;
+}
+
 #custom-leftin1 {
-  color: @cpu;
+  color: @temperature;
   margin-bottom: -1px;
 }
 
@@ -416,6 +459,8 @@ tooltip label,
 #custom-left6,
 #custom-left7,
 #custom-left8,
+#custom-left9,
+#custom-left10,
 #custom-right1,
 #custom-right2,
 #custom-right3,

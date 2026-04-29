@@ -41,6 +41,12 @@ return {
             ["s"] = false,
             ["v"] = false,
             ["t"] = false,
+            ["p"] = { "actions.paste_from_system_clipboard", desc = "Oil: вставить файл или каталог" },
+            ["gp"] = {
+                "actions.paste_from_system_clipboard",
+                opts = { delete_original = true },
+                desc = "Oil: переместить сюда из буфера обмена",
+            },
             ["<C-p>"] = false,
             ["<C-c>"] = { "actions.close", mode = "n", desc = "Oil: закрыть" },
             ["gr"] = { "actions.refresh", desc = "Oil: обновить список" },

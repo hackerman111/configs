@@ -37,18 +37,5 @@ return {
 
     config = function(_, opts)
         require("nvim-treesitter.config").setup(opts) -- ← НОВОЕ ИМЯ МОДУЛЯ (2026)
-        vim.g.nvim_treesitter_legacy_modules = opts
-
-        local parsers = require("nvim-treesitter.parsers")
-        if parsers.ft_to_lang == nil and vim.treesitter.language and vim.treesitter.language.get_lang then
-            parsers.ft_to_lang = function(filetype)
-                return vim.treesitter.language.get_lang(filetype) or filetype
-            end
-        end
-        if parsers.get_parser == nil and vim.treesitter.get_parser then
-            parsers.get_parser = function(bufnr, lang)
-                return vim.treesitter.get_parser(bufnr, lang)
-            end
-        end
     end,
 }

@@ -11,32 +11,100 @@ position:
   x: R
   y: P
 
+custom_variables: []
+
 macros:
-  sessionx:
-    - send-prefix
-    - send-keys o
-  extrakto:
-    - send-prefix
-    - send-keys x
-  thumbs:
-    - send-prefix
-    - send-keys ';'
-  jump:
-    - send-prefix
-    - send-keys j
-  neolazygit:
-    - send-prefix
-    - send-keys N
-  popup-shell:
-    - display-popup -E -w 90% -h 90% -d '#{pane_current_path}' '$SHELL'
-  popup-lazygit:
-    - display-popup -E -w 92% -h 92% -d '#{pane_current_path}' 'lazygit'
-  copycat-files:
-    - send-prefix
-    - send-keys C-f
-  copycat-urls:
-    - send-prefix
-    - send-keys C-u
+  - name: sessionx
+    commands:
+      - send-prefix
+      - send-keys o
+  - name: extrakto
+    commands:
+      - send-prefix
+      - send-keys x
+  - name: thumbs
+    commands:
+      - run-shell -b ~/.tmux/plugins/tmux-thumbs/tmux-thumbs.sh
+  - name: jump
+    commands:
+      - send-prefix
+      - send-keys j
+  - name: neolazygit
+    commands:
+      - send-prefix
+      - send-keys N
+  - name: popup-shell
+    commands:
+      - send-prefix
+      - send-keys p
+  - name: popup-lazygit
+    commands:
+      - send-prefix
+      - send-keys G
+  - name: popup-yazi
+    commands:
+      - send-prefix
+      - send-keys e
+  - name: popup-agent
+    commands:
+      - send-prefix
+      - send-keys a
+  - name: copycat-files
+    commands:
+      - send-prefix
+      - send-keys C-f
+  - name: copycat-urls
+    commands:
+      - send-prefix
+      - send-keys C-u
+  - name: workspace-layout
+    commands:
+      - send-prefix
+      - send-keys m
+  - name: edit-window
+    commands:
+      - send-prefix
+      - send-keys E
+  - name: agent-window
+    commands:
+      - send-prefix
+      - send-keys A
+  - name: run-window
+    commands:
+      - send-prefix
+      - send-keys U
+  - name: recent-files
+    commands:
+      - send-prefix
+      - send-keys f
+  - name: all-files
+    commands:
+      - send-prefix
+      - send-keys F
+  - name: ripgrep-search
+    commands:
+      - send-prefix
+      - send-keys /
+  - name: review-changes
+    commands:
+      - send-prefix
+      - send-keys V
+  - name: diff-changes
+    commands:
+      - send-prefix
+      - send-keys D
+  - name: copy-pane-context
+    commands:
+      - send-prefix
+      - send-keys Y
+  - name: sync-panes
+    commands:
+      - send-prefix
+      - send-keys S
+  - name: tea-menu
+    commands:
+      - send-prefix
+      - send-keys t
 
 items:
   - name: +Session
@@ -56,7 +124,54 @@ items:
         command: next-window
       - name: Rename window
         key: r
-        command: command-prompt -I '#W' 'rename-window -- "%%%"'
+        command: command-prompt -I "#W" "rename-window -- \"%%%\""
+
+  - name: +Agent
+    key: a
+    menu:
+      - name: Bootstrap edit/agent/run
+        key: m
+        macro: workspace-layout
+      - name: Edit window
+        key: e
+        macro: edit-window
+      - name: Agent window
+        key: a
+        macro: agent-window
+      - name: Agent popup
+        key: p
+        macro: popup-agent
+      - name: Run window
+        key: r
+        macro: run-window
+      - name: Review changed files
+        key: v
+        macro: review-changes
+      - name: Diff changed files
+        key: d
+        macro: diff-changes
+      - name: Copy pane context
+        key: y
+        macro: copy-pane-context
+      - name: Synchronize panes
+        key: s
+        macro: sync-panes
+
+  - name: +Files
+    key: f
+    menu:
+      - name: Recent and changed files
+        key: f
+        macro: recent-files
+      - name: All project files
+        key: a
+        macro: all-files
+      - name: Changed files
+        key: c
+        macro: copycat-files
+      - name: Ripgrep search
+        key: /
+        macro: ripgrep-search
 
   - name: +Pane
     key: p
@@ -85,13 +200,13 @@ items:
     menu:
       - name: Vertical split
         key: '|'
-        command: split-window -h -c '#{pane_current_path}'
+        command: split-window -h -c "#{pane_current_path}"
       - name: Horizontal split
         key: '-'
-        command: split-window -v -c '#{pane_current_path}'
+        command: split-window -v -c "#{pane_current_path}"
       - name: New window
         key: c
-        command: new-window -c '#{pane_current_path}'
+        command: new-window -c "#{pane_current_path}"
       - name: Kill pane
         key: x
         command: kill-pane
@@ -130,6 +245,12 @@ items:
       - name: Neolazygit
         key: N
         macro: neolazygit
+      - name: Yazi popup
+        key: e
+        macro: popup-yazi
+      - name: Tea timer
+        key: t
+        macro: tea-menu
 
   - name: +Resize
     key: r
@@ -146,4 +267,3 @@ items:
       - name: Shorter
         key: k
         command: resize-pane -U 5
-

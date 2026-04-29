@@ -7,7 +7,7 @@ return {
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
-			require("lualine").setup(require("config.ui").lualine_opts())
+			require("lualine").setup({ options = { theme = "auto", icons_enabled = true } })
 		end,
 	},
 	-- Линии отступов
@@ -42,9 +42,18 @@ return {
 		"folke/snacks.nvim",
 		priority = 1000,
 		lazy = false,
-		opts = function()
-			return require("config.ui").snacks_opts()
-		end,
+		opts = {
+			-- more beautiful vim.ui.input
+			input = {
+				enabled = true,
+				win = {
+					relative = "cursor",
+					backdrop = true,
+				},
+			},
+			-- more beautiful vim.ui.select
+			picker = { enabled = true },
+		},
 	},
 	---Красивая заставка
 	{
@@ -111,10 +120,32 @@ return {
 	---Название файла
 	{
 		"b0o/incline.nvim",
+		dependencies = { "craftzdog/solarized-osaka.nvim" },
 		event = "BufReadPre",
 		priority = 1200,
 		config = function()
-			require("incline").setup(require("config.ui").incline_opts())
+			local colors = require("solarized-osaka.colors").setup()
+			require("incline").setup({
+				highlight = {
+					groups = {
+						InclineNormal = { guibg = colors.magenta500, guifg = colors.base04 },
+						InclineNormalNC = { guifg = colors.violet500, guibg = colors.base03 },
+					},
+				},
+				window = { margin = { vertical = 0, horizontal = 1 } },
+				hide = {
+					cursorline = true,
+				},
+				render = function(props)
+					local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
+					if vim.bo[props.buf].modified then
+						filename = "[+] " .. filename
+					end
+
+					local icon, color = require("nvim-web-devicons").get_icon_color(filename)
+					return { { icon, guifg = color }, { " " }, { filename } }
+				end,
+			})
 		end,
 	},
 	---Название буфера

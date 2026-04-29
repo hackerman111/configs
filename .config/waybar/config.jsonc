@@ -26,6 +26,10 @@
 
     "custom/left4",
     "cpu",                  // cpu
+    "custom/left9",
+    "custom/gpu-temp",      // gpu temperature
+    "custom/left10",
+    "custom/gpu-vram",      // gpu vram usage
     "custom/leftin1",
 
 
@@ -191,6 +195,28 @@
 
   "custom/temperature": {
     "exec": "~/.config/waybar/scripts/cpu-temp.sh",
+    "return-type": "json",
+    "format": "{}",
+    "interval": 5,
+    "min-length": 7,
+    "max-length": 7
+  },
+
+  // ─────────────────────────────────────────────────────┤ gpu temperature ├───
+
+  "custom/gpu-temp": {
+    "exec": "~/.config/waybar/scripts/gpu-temp.sh",
+    "return-type": "json",
+    "format": "{}",
+    "interval": 5,
+    "min-length": 7,
+    "max-length": 7
+  },
+
+  // ───────────────────────────────────────────────────────────┤ gpu vram ├───
+
+  "custom/gpu-vram": {
+    "exec": "~/.config/waybar/scripts/gpu-vram.sh",
     "return-type": "json",
     "format": "{}",
     "interval": 5,
@@ -464,6 +490,14 @@
     "tooltip": false
   },
   "custom/left8": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left9": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left10": {
     "format": "",
     "tooltip": false
   },

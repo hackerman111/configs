@@ -26,8 +26,6 @@ opt.smartcase = true  -- Учитывать регистр, если в запр
 opt.scrolloff = 8   -- Оставлять 8 строк контекста при скроллинге
 opt.undofile = true -- Сохранять историю изменений между сессиями
 
-require("config.ui").apply_core_options()
-
 -- Автоматический импорт/экспорт output-ов при работе с .ipynb
 vim.api.nvim_create_autocmd("BufAdd", {
     pattern = "*.ipynb",

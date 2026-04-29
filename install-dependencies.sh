@@ -17,9 +17,12 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 DOTFILES_REPO="https://github.com/hackerman111/configs.git"
+DOTFILES_BRANCH="${DOTFILES_BRANCH:-main}"
+INSTALL_OPTIONAL_AUR="${INSTALL_OPTIONAL_AUR:-0}"
 
 # Папка, куда будет скачан репозиторий
-DOTFILES_DIR="$HOME/configs"
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/configs}"
+CONFIG_BACKUP_DIR=""
 
 # Функции для красивого вывода
 print_info() {
@@ -42,6 +45,70 @@ print_section() {
     echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}$1${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+}
+
+backup_path_if_needed() {
+    local target="$1"
+    local source="$2"
+
+    if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
+        return 0
+    fi
+
+    if [ -e "$target" ] || [ -L "$target" ]; then
+        CONFIG_BACKUP_DIR="${CONFIG_BACKUP_DIR:-$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)}"
+        mkdir -p "$CONFIG_BACKUP_DIR"
+        print_warning "Существующий $target перенесен в $CONFIG_BACKUP_DIR"
+        mv "$target" "$CONFIG_BACKUP_DIR/$(basename "$target")"
+    fi
+}
+
+link_config_path() {
+    local relative_source="$1"
+    local relative_target="$2"
+    local source="$DOTFILES_DIR/$relative_source"
+    local target="$HOME/$relative_target"
+
+    if [ ! -e "$source" ]; then
+        print_warning "Пропускаю $relative_source: нет такого пути в репозитории"
+        return 0
+    fi
+
+    backup_path_if_needed "$target" "$source"
+    mkdir -p "$(dirname "$target")"
+    ln -sfn "$source" "$target"
+    print_info "$target -> $source"
+}
+
+deploy_dotfiles_configs() {
+    print_info "Развертывание конфигов из $DOTFILES_DIR"
+
+    link_config_path ".zshrc" ".zshrc"
+    link_config_path ".tmux.conf" ".tmux.conf"
+    link_config_path ".config/hypr" ".config/hypr"
+    link_config_path ".config/kitty" ".config/kitty"
+    link_config_path ".config/neofetch" ".config/neofetch"
+    link_config_path ".config/waybar" ".config/waybar"
+    link_config_path ".config/yazi" ".config/yazi"
+    link_config_path "nvim/.config/nvim" ".config/nvim"
+    link_config_path "tmux/.config/tmux" ".config/tmux"
+    link_config_path "zathura/.config/zathura" ".config/zathura"
+
+    find "$DOTFILES_DIR/.config/waybar/scripts" -type f -name "*.sh" -exec chmod +x {} + 2>/dev/null || true
+    [ -f "$DOTFILES_DIR/.config/hypr/wall-switcher.sh" ] && chmod +x "$DOTFILES_DIR/.config/hypr/wall-switcher.sh"
+
+    print_success "Конфиги развернуты"
+}
+
+run_optional_step() {
+    local description="$1"
+    shift
+
+    if "$@"; then
+        print_success "$description"
+    else
+        print_warning "$description не выполнено; можно повторить вручную позже"
+    fi
 }
 
 # Проверка прав суперпользователя
@@ -71,6 +138,10 @@ BASIC_TOOLS=(
     git                 # Система контроля версий
     curl                # Утилита для загрузки
     wget                # Альтернатива curl
+    ca-certificates     # TLS для curl/git на чистой системе
+    gnupg               # Проверка подписей
+    rsync               # Синхронизация файлов
+    sudo                # Эскалация прав
     unzip               # Распаковка архивов
     xdg-utils          # Утилиты XDG
     polkit             # Аутентификация
@@ -89,8 +160,13 @@ print_success "Базовые инструменты установлены"
 print_section "3. Установка Hyprland и компонентов Wayland"
 
 HYPRLAND_PACKAGES=(
+    hypridle           # Idle-lock daemon Hyprland
     hyprland           # Оконный менеджер
+    hyprlock           # Блокировка экрана Hyprland
     hyprpaper          # Обои для Hyprland
+    hyprpicker         # Color picker под Wayland
+    hyprshot           # Скриншоты под Hyprland
+    niri               # Дополнительный Wayland compositor из текущей системы
     xdg-desktop-portal-hyprland  # Desktop portal
 )
 
@@ -107,7 +183,7 @@ print_section "4. Установка Waybar и системных утилит"
 WAYBAR_PACKAGES=(
     waybar             # Статус-бар
     wofi               # Меню приложений
-    rofi-wayland       # Альтернативное меню
+    rofi               # Альтернативное меню
     dunst              # Уведомления (опционально)
     brightnessctl      # Управление яркостью
     playerctl          # Управление медиаплеером
@@ -117,9 +193,17 @@ WAYBAR_PACKAGES=(
     network-manager-applet  # Апплет NetworkManager
     bluez              # Bluetooth стек
     bluez-utils        # Утилиты Bluetooth
+    blueman            # GUI/TUI-совместимое управление Bluetooth
+    bluetui            # Bluetooth TUI
     lm_sensors         # Датчики температуры
+    nvidia-utils       # NVIDIA sensors/nvidia-smi для waybar gpu scripts
+    nvtop              # Мониторинг GPU
+    pipewire-pulse     # PulseAudio compatibility поверх PipeWire
+    piper              # Настройка игровых мышей/logiops окружения
     upower             # Управление питанием
     pacman-contrib     # checkupdates
+    cups               # Печать
+    reflector          # Обновление mirrorlist
 )
 
 print_info "Установка: ${WAYBAR_PACKAGES[*]}"
@@ -139,6 +223,7 @@ print_section "6. Установка терминалов и оболочки"
 
 TERMINAL_PACKAGES=(
     kitty              # Основной терминал
+    wezterm            # Основной tmux-first terminal workflow
     alacritty          # Альтернативный терминал
     tmux               # Мультиплексор терминала
     zsh                # Z Shell
@@ -152,7 +237,7 @@ print_success "Терминалы установлены"
 # Установка Zsh как оболочки по умолчанию
 print_info "Установка Zsh как оболочки по умолчанию..."
 if [ "$SHELL" != "$(which zsh)" ]; then
-    chsh -s "$(which zsh)"
+    sudo chsh -s "$(which zsh)" "$USER"
     print_success "Zsh установлен как оболочка по умолчанию"
 else
     print_info "Zsh уже является оболочкой по умолчанию"
@@ -193,10 +278,14 @@ CLI_TOOLS=(
     zoxide             # Умный cd
     starship           # Промпт
     lazygit            # TUI для Git
+    gitui              # Альтернативный TUI для Git
     thefuck            # Исправление команд
     tree               # Дерево каталогов
     htop               # Монитор процессов
+    glances            # Расширенный монитор процессов
     ncdu               # Анализатор дисков
+    dust               # Современный анализатор дисков
+    gdu                # Быстрый анализатор дисков
     tldr               # Упрощенные man-страницы
     yazi 
     ffmpeg 
@@ -212,6 +301,20 @@ CLI_TOOLS=(
     just 
     git-delta
     yq
+    bats
+    expac
+    go
+    ipcalc
+    keepassxc
+    meson
+    navi
+    patchelf
+    podman
+    python-pipx
+    qwen-code
+    smartdns
+    whois
+    tealdeer
 )
 
 print_info "Установка: ${CLI_TOOLS[*]}"
@@ -228,6 +331,9 @@ NEOVIM_PACKAGES=(
     neovim             # Редактор
     python             # Python 3
     python-pip         # pip для Python
+    python-pipx        # Изолированная установка Python CLI
+    python-pymupdf     # PDF tooling для заметок/скриптов
+    python-pytesseract # OCR интеграция
     nodejs             # Node.js для LSP
     npm                # npm для Node.js
     lua                # Lua
@@ -241,6 +347,7 @@ NEOVIM_PACKAGES=(
     make               # Build tool
     cmake              # Build system
     ninja              # Build system
+    tree-sitter-cli    # CLI для tree-sitter grammar tooling
 )
 
 print_info "Установка: ${NEOVIM_PACKAGES[*]}"
@@ -276,6 +383,8 @@ LATEX_PACKAGES=(
     zathura-ps
     zathura-cb
     inkscape           # Векторная графика (для inkscape-figures)
+    tesseract-data-eng # OCR English
+    tesseract-data-rus # OCR Russian
 )
 
 print_info "Начинается установка LaTeX (может занять время, ~2GB)..."
@@ -318,6 +427,7 @@ PKGLIST_REPO=(
     alacritty
     alligator
     angelfish
+    archiso
     arianna
     ark
     artikulate
@@ -330,8 +440,10 @@ PKGLIST_REPO=(
     base
     base-devel
     bat
+    bats
     biber
     bind
+    bleachbit
     blinken
     bluedevil
     blueman
@@ -350,8 +462,11 @@ PKGLIST_REPO=(
     clang
     cmake
     colord-kde
+    cuda
+    cups
     decibels
     discover
+    dnsmasq
     docker
     docker-buildx
     docker-compose
@@ -360,12 +475,14 @@ PKGLIST_REPO=(
     dragon
     drkonqi
     dunst
+    dust
     easy-rsa
     efibootmgr
     elisa
     epiphany
     espeak-ng
     exo
+    expac
     eza
     falkon
     fd
@@ -377,8 +494,12 @@ PKGLIST_REPO=(
     fzf
     garcon
     gdm
+    gdu
     ghostwriter
     git
+    git-delta
+    gitui
+    glances
     gnome-backgrounds
     gnome-calculator
     gnome-calendar
@@ -407,6 +528,7 @@ PKGLIST_REPO=(
     gnome-user-docs
     gnome-user-share
     gnome-weather
+    go
     granatier
     grantlee-editor
     grilo-plugins
@@ -415,7 +537,6 @@ PKGLIST_REPO=(
     gvfs-afc
     gvfs-dnssd
     gvfs-goa
-    gvfs-google
     gvfs-gphoto2
     gvfs-mtp
     gvfs-nfs
@@ -424,18 +545,22 @@ PKGLIST_REPO=(
     gvfs-wsdd
     gwenview
     htop
+    hypridle
     hyprland
     hyprlock
     hyprpaper
+    hyprpicker
     hyprshot
     imv
     inkscape
     intel-ucode
+    ipcalc
     ipset
     isoimagewriter
     itinerary
     jq
     juk
+    just
     k3b
     kactivitymanagerd
     kaddressbook
@@ -487,6 +612,7 @@ PKGLIST_REPO=(
     kdialog
     kdiamond
     keditbookmarks
+    keepassxc
     keysmith
     kfind
     kfourinline
@@ -586,6 +712,7 @@ PKGLIST_REPO=(
     libksysguard
     libnetfilter_queue
     libplasma
+    libratbag
     lightdm
     lightdm-gtk-greeter
     linux
@@ -602,12 +729,14 @@ PKGLIST_REPO=(
     massif-visualizer
     mbox-importer
     merkuro
+    meson
     milou
     minuet
     mousepad
     mpv
     nano
     nautilus
+    navi
     ncdu
     neochat
     neovim
@@ -616,6 +745,7 @@ PKGLIST_REPO=(
     networkmanager-openvpn
     nftables
     ninja
+    niri
     nodejs
     noto-fonts
     npm
@@ -624,6 +754,7 @@ PKGLIST_REPO=(
     nvidia-open-dkms
     nvidia-settings
     nvidia-utils
+    nvtop
     nyxt
     obsidian
     ocean-sound-theme
@@ -641,11 +772,14 @@ PKGLIST_REPO=(
     parley
     parole
     partitionmanager
+    patchelf
     pavucontrol
     pdftk
     picmi
     pim-data-exporter
     pim-sieve-editor
+    piper
+    pipewire-pulse
     plasma-activities-stats
     plasma-browser-integration
     plasma-desktop
@@ -665,6 +799,7 @@ PKGLIST_REPO=(
     plasmatube
     playerctl
     plymouth-kcm
+    podman
     polkit-kde-agent
     powerdevil
     poxml
@@ -672,14 +807,20 @@ PKGLIST_REPO=(
     pulseaudio
     pulseaudio-bluetooth
     python-pip
+    python-pipx
+    python-pymupdf
+    python-pytesseract
     qpdf
     qqc2-breeze-style
     qrca
+    qwen-code
+    reflector
     resvg
     ripgrep
     ristretto
     rocs
     rofi
+    rsync
     rygel
     sagemath
     sddm-kcm
@@ -688,6 +829,7 @@ PKGLIST_REPO=(
     skanlite
     skanpage
     skladnik
+    smartdns
     snapshot
     spectacle
     starship
@@ -700,6 +842,8 @@ PKGLIST_REPO=(
     tecla
     telegram-desktop
     telly-skout
+    tesseract-data-eng
+    tesseract-data-rus
     texlive-basic
     texlive-bibtexextra
     texlive-binextra
@@ -732,7 +876,9 @@ PKGLIST_REPO=(
     vim-spell-ru
     wacomtablet
     waybar
+    wezterm
     wget
+    whois
     wireless_tools
     wl-clipboard
     wofi
@@ -744,7 +890,6 @@ PKGLIST_REPO=(
     xf86-video-vesa
     xfburn
     xfce4-appfinder
-    xfce4-artwork
     xfce4-battery-plugin
     xfce4-clipman-plugin
     xfce4-cpufreq-plugin
@@ -783,7 +928,6 @@ PKGLIST_REPO=(
     xfconf
     xfdesktop
     xfwm4
-    xfwm4-themes
     xorg-bdftopcf
     xorg-docs
     xorg-font-util
@@ -834,8 +978,10 @@ PKGLIST_REPO=(
     yakuake
     yazi
     yelp
+    yq
     zanshin
     zathura
+    zathura-djvu
     zathura-pdf-mupdf
     zoxide
     zsh
@@ -874,55 +1020,74 @@ AUR_PACKAGES=(
     hyprshot           # Скриншоты для Hyprland
     warpd              # Управление курсором с клавиатуры
     bluetui            # Bluetooth TUI
-    tmuxifier          # Tmux layout manager
-    wordnet-cli        # Словарь (для Neovim blink-cmp)
     obsidian
     xkb-switch         # Переключатель раскладки (полезно для Neovim)
     neofetch
     # Все пакеты из pkglist-aur.txt
+    adguardvpn-cli-bin
     agg
+    aimp
+    amneziavpn-bin
     antigravity
+    carapace-bin
+    clash-verge-rev-bin
+    cloudflare-warp-bin
     djvu2pdf
     google-chrome
     grub-customizer
+    hiddify-app-bin
+    iprange
     jdownloader2
     latex-mk
+    localsend-bin
+    logiops
     neofetch-git
+    qmd
+    scantailor-advanced-git
+    sing-box
+    throne-bin
     visual-studio-code-bin
+    v2raya-bin
     yandex-browser
     yay-bin
-    yay-bin-debug
+    xfce4-artwork
+    xfwm4-themes
     zotero-git
 )
 
 print_info "Установка из AUR: ${AUR_PACKAGES[*]}"
+FAILED_AUR_PACKAGES=()
 for package in "${AUR_PACKAGES[@]}"; do
     if yay -Q "$package" &> /dev/null; then
         print_info "$package уже установлен"
     else
         print_info "Установка $package..."
-        yay -S --noconfirm "$package"
+        if yay -S --needed --noconfirm "$package"; then
+            print_success "$package установлен"
+        else
+            print_warning "$package не установлен; продолжаю установку остальных AUR пакетов"
+            FAILED_AUR_PACKAGES+=("$package")
+        fi
     fi
 done
+if [ "${#FAILED_AUR_PACKAGES[@]}" -gt 0 ]; then
+    print_warning "AUR пакеты, которые нужно проверить вручную: ${FAILED_AUR_PACKAGES[*]}"
+fi
 print_success "AUR пакеты установлены"
 
-# Опциональные AUR пакеты
-print_info "Опциональные пакеты:"
-echo "  - yandex-browser (браузер)"
-echo "  - telegram-desktop-bin (мессенджер)"
-echo "  - flatpak (для дополнительных приложений)"
-
-read -p "Установить опциональные пакеты? [y/N] " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+# Опциональные AUR пакеты. Для полностью автоматического bootstrap не задаем вопросы.
+if [ "$INSTALL_OPTIONAL_AUR" = "1" ]; then
+    print_info "Установка опциональных пакетов (INSTALL_OPTIONAL_AUR=1)"
     OPTIONAL_AUR=(
         telegram-desktop-bin
         flatpak
     )
     for package in "${OPTIONAL_AUR[@]}"; do
-        yay -S --noconfirm "$package"
+        yay -S --needed --noconfirm "$package"
     done
     print_success "Опциональные пакеты установлены"
+else
+    print_info "Опциональные AUR пакеты пропущены. Для установки запустите с INSTALL_OPTIONAL_AUR=1"
 fi
 
 # ============================================================================
@@ -994,23 +1159,22 @@ print_info "Используется репозиторий: $DOTFILES_REPO"
 # Клонирование или обновление репозитория
 if [ ! -d "$DOTFILES_DIR" ]; then
     print_info "Клонирование репозитория..."
-    git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
+    git clone --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO" "$DOTFILES_DIR"
+elif [ ! -d "$DOTFILES_DIR/.git" ]; then
+    CONFIG_BACKUP_DIR="${CONFIG_BACKUP_DIR:-$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)}"
+    print_warning "$DOTFILES_DIR уже существует и не является git checkout; переношу в $CONFIG_BACKUP_DIR"
+    mkdir -p "$CONFIG_BACKUP_DIR"
+    mv "$DOTFILES_DIR" "$CONFIG_BACKUP_DIR/$(basename "$DOTFILES_DIR")"
+    git clone --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO" "$DOTFILES_DIR"
 else
     print_info "Обновление репозитория..."
-    cd "$DOTFILES_DIR" && git pull
+    git -C "$DOTFILES_DIR" pull --ff-only
 fi
 
-# Применение конфигов через Stow
+# Применение конфигов. Явно разворачиваем только реальные dotfiles-пути
+# текущего репозитория; stow */ не захватывает .config и тащит служебные папки.
 if [ -d "$DOTFILES_DIR" ]; then
-    cd "$DOTFILES_DIR"
-    print_info "Применение конфигурации..."
-    
-    # Используем stow для всех папок в репозитории (эквивалент stow */)
-    # --restow перезаписывает симлинки, если они изменились
-    # Игнорируем .git
-    stow --restow --target="$HOME" --ignore=".git" */
-    
-    print_success "Конфигурация применена!"
+    deploy_dotfiles_configs
 fi
 
 
@@ -1029,10 +1193,26 @@ print_success "Кэш шрифтов обновлен"
 print_info "Включение системных служб..."
 sudo systemctl enable NetworkManager.service
 sudo systemctl start NetworkManager.service
+run_optional_step "Docker service включен" sudo systemctl enable --now docker.service
+run_optional_step "Пользователь добавлен в группу docker" sudo usermod -aG docker "$USER"
+run_optional_step "CUPS service включен" sudo systemctl enable --now cups.service
+run_optional_step "Reflector timer включен" sudo systemctl enable --now reflector.timer
 
 # Создание символических ссылок (если нужно)
 print_info "Проверка символических ссылок..."
-# Здесь можно добавить создание симлинков на конфиги
+
+# Автоустановка плагинов после раскладки конфигов
+if [ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+    run_optional_step "Tmux plugins установлены" "$HOME/.tmux/plugins/tpm/bin/install_plugins"
+fi
+
+if command -v zsh >/dev/null 2>&1; then
+    run_optional_step "Zinit/Zsh plugins обновлены" zsh -lic 'zinit update --all'
+fi
+
+if command -v nvim >/dev/null 2>&1 && [ -d "$HOME/.config/nvim" ]; then
+    run_optional_step "Neovim Lazy plugins синхронизированы" nvim --headless '+Lazy! sync' '+qa'
+fi
 
 # ============================================================================
 # ИТОГОВАЯ ИНФОРМАЦИЯ
@@ -1044,10 +1224,10 @@ echo -e "${GREEN}Все зависимости успешно установле
 
 echo -e "${YELLOW}Следующие шаги:${NC}"
 echo "1. Перезапустите систему или выйдите/войдите для применения изменений"
-echo "2. Скопируйте конфигурационные файлы в ~/.config/"
+echo "2. Конфиги уже развернуты симлинками из $DOTFILES_DIR"
 echo "3. При первом запуске Neovim выполните :Lazy sync для установки плагинов"
 echo "4. В Tmux нажмите <prefix> + I для установки плагинов (Ctrl+Space + I)"
-echo "5. Запустите 'hyprctl reload' после копирования конфига Hyprland"
+echo "5. Запустите 'hyprctl reload' после входа в Hyprland"
 
 echo -e "\n${YELLOW}Дополнительная информация:${NC}"
 echo "- Конфигурация Neovim: ~/.config/nvim/"

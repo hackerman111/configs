@@ -1,6 +1,3 @@
 return {
-	{
-		"stevearc/dressing.nvim",
-		enabled = false,
-	},
+	"stevearc/dressing.nvim",
 }

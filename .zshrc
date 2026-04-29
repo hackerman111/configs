@@ -17,6 +17,15 @@ export PAGER='less'
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export ZDOTDIR="${ZDOTDIR:-$HOME}"
+# -----------------------------------------------------------------------------
+# ARGC COMPLETIONS
+# -----------------------------------------------------------------------------
+export ARGC_COMPLETIONS_ROOT="$XDG_DATA_HOME/argc-completions"
+
+if [[ -d "$ARGC_COMPLETIONS_ROOT" ]]; then
+  export ARGC_COMPLETIONS_PATH="$ARGC_COMPLETIONS_ROOT/completions/linux:$ARGC_COMPLETIONS_ROOT/completions"
+  export PATH="$ARGC_COMPLETIONS_ROOT/bin:$PATH"
+fi
 
 # user paths
 export PATH="$HOME/tools/llvm-project/build/bin:$PATH"
@@ -78,6 +87,9 @@ alias ll='eza -lh --icons --git --header'
 alias la='eza -lah --icons --git --header'
 alias lt='eza --tree --level=3 --icons --git'
 alias l.='eza -a | grep -E "^\."'
+
+#ffmpeg
+alias mp4tomp3='for f in *.mp4; do ffmpeg -i "$f" -q:a 0 -map a "${f%.mp4}.mp3"; done'
 
 # editors / tooling
 alias c='clear'
@@ -143,27 +155,239 @@ zinit light-mode for \
 # -----------------------------------------------------------------------------
 # COMPLETION STYLE — configure BEFORE compinit/fzf-tab
 # -----------------------------------------------------------------------------
-zstyle ':completion:*' menu no
-zstyle ':completion:*' matcher-list \
-  'm:{a-z}={A-Za-z}' \
-  'r:|[._-]=* r:|=*' \
-  'l:|=* r:|=*'
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
-zstyle ':completion:*:descriptions' format '[%d]'
-zstyle ':completion:*:warnings' format '%F{yellow}-- no matches found --%f'
-zstyle ':completion:*:corrections' format '%F{green}-- %d (errors: %e) --%f'
-zstyle ':completion:*' squeeze-slashes true
-zstyle ':completion:*' rehash true
 
-# better completion behavior for common dev tools
-zstyle ':completion:*:git-checkout:*' sort false
-zstyle ':completion:*:git-switch:*' sort false
-zstyle ':completion:*:*:docker:*' option-stacking yes
-zstyle ':completion:*:*:kubectl:*' list-grouped false
+# -----------------------------------------------------------------------------
+# fzf-tab
+# -----------------------------------------------------------------------------
+zstyle ':fzf-tab:*' fzf-command fzf
+
+# Не наследовать общий FZF_DEFAULT_OPTS:
+# общий preview-window/bind часто ломает completion-контексты fzf-tab.
+zstyle ':fzf-tab:*' use-fzf-default-opts no
+
+zstyle ':fzf-tab:*' fzf-flags \
+  --height=60% \
+  --layout=reverse \
+  --border=rounded \
+  --cycle \
+  --ansi \
+  --info=inline \
+  --preview-window=right,55%,wrap \
+  --bind=ctrl-j:down \
+  --bind=ctrl-k:up \
+  --bind=alt-j:down \
+  --bind=alt-k:up \
+  --bind=ctrl-u:preview-half-page-up \
+  --bind=ctrl-d:preview-half-page-down \
+  --bind=ctrl-f:preview-page-down \
+  --bind=ctrl-b:preview-page-up \
+  --bind=ctrl-space:toggle \
+  --bind=tab:accept
+
+zstyle ':fzf-tab:*' switch-group '<' '>'
+zstyle ':fzf-tab:*' continuous-trigger '/'
+zstyle ':fzf-tab:*' show-group full
+zstyle ':fzf-tab:*' prefix ''
+zstyle ':fzf-tab:*' fzf-min-height 15
+
+# Директории: компактное дерево.
+zstyle ':fzf-tab:complete:cd:*' fzf-preview '
+  if (( $+commands[eza] )); then
+    eza --tree --level=2 --icons --git --color=always "$realpath" 2>/dev/null | head -200
+  else
+    ls -la --color=always "$realpath" 2>/dev/null
+  fi
+'
+
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview '
+  if (( $+commands[eza] )); then
+    eza --tree --level=2 --icons --git --color=always "$realpath" 2>/dev/null | head -200
+  else
+    ls -la --color=always "$realpath" 2>/dev/null
+  fi
+'
+
+# Общий preview для файлов.
+zstyle ':fzf-tab:complete:*:*' fzf-preview '
+  if [[ -d "$realpath" ]]; then
+  if (( $+commands[eza] )); then
+    eza --tree --level=2 --icons --git --color=always "$realpath" 2>/dev/null | head -200
+  else
+    ls -la --color=always "$realpath" 2>/dev/null
+  fi
+  elif [[ -f "$realpath" ]]; then
+    mime=$(file --mime-type -b "$realpath" 2>/dev/null)
+    case "$mime" in
+      text/*|application/json|application/xml|application/yaml|application/x-sh|application/x-shellscript)
+        if (( $+commands[bat] )); then
+          bat --style=numbers --color=always --line-range=:250 "$realpath" 2>/dev/null
+        else
+          sed -n "1,250p" "$realpath" 2>/dev/null
+        fi
+        ;;
+      image/*)
+        if (( $+commands[chafa] )); then
+          chafa "$realpath" 2>/dev/null
+        else
+          file "$realpath" 2>/dev/null
+        fi
+        ;;
+      *)
+        file "$realpath" 2>/dev/null
+        ;;
+    esac
+  else
+    print -r -- "$desc"
+  fi
+'
+
+# Git.
+zstyle ':fzf-tab:complete:git-(add|diff|restore):*' fzf-preview '
+  git diff --color=always -- "$word" 2>/dev/null |
+    { (( $+commands[delta] )) && delta || cat; }
+'
+
+zstyle ':fzf-tab:complete:git-(checkout|switch):*' fzf-preview '
+  case "$group" in
+    *modified*|*file*)
+      git diff --color=always -- "$word" 2>/dev/null |
+        { (( $+commands[delta] )) && delta || cat; }
+      ;;
+    *commit*)
+      git show --color=always --stat --patch "$word" 2>/dev/null |
+        { (( $+commands[delta] )) && delta || cat; }
+      ;;
+    *branch*|*tag*)
+      git log --color=always --oneline --graph --decorate -30 "$word" 2>/dev/null
+      ;;
+    *)
+      git log --color=always --oneline --graph --decorate --all -30 2>/dev/null
+      ;;
+  esac
+'
+
+# Процессы.
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-preview '
+  [[ "$group" == *process* || "$group" == *PID* ]] &&
+    ps --pid="$word" -o pid,ppid,user,%cpu,%mem,etime,stat,args -w -w 2>/dev/null
+'
+
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-flags \
+  --height=50% \
+  --layout=reverse \
+  --border=rounded \
+  --ansi \
+  --preview-window=down:5:wrap
+
+# systemctl.
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview '
+  SYSTEMD_COLORS=1 systemctl status "$word" --no-pager --full 2>/dev/null
+'
+
+# ssh/scp/sftp.
+zstyle ':fzf-tab:complete:(ssh|scp|sftp|sshfs|mosh):*' fzf-preview '
+  ssh -G "${word##*@}" 2>/dev/null | sed -n "1,120p"
+'
+
+# npm/pnpm.
+zstyle ':fzf-tab:complete:(npm|pnpm|yarn):*' fzf-preview '
+  if [[ -f package.json ]]; then
+    if (( $+commands[jq] )); then
+      jq -r ".scripts // {} | to_entries[] | \"\(.key)\t\(.value)\"" package.json 2>/dev/null
+    else
+      sed -n "1,160p" package.json 2>/dev/null
+    fi
+  fi
+'
+
+# cargo/rustup/uv/just/docker/kubectl.
+zstyle ':fzf-tab:complete:(cargo|rustup|uv|just):*' fzf-preview '
+  case "$group" in
+    *command*|*commands*)
+      "$words[1]" "$word" --help 2>/dev/null | sed -n "1,160p"
+      ;;
+    *)
+      print -r -- "$group: $word"
+      ;;
+  esac
+'
+
+zstyle ':fzf-tab:complete:docker:*' fzf-preview '
+  docker inspect "$word" 2>/dev/null | sed -n "1,180p" ||
+  docker ps -a --filter "name=$word" --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}" 2>/dev/null
+'
+
+zstyle ':fzf-tab:complete:kubectl:*' fzf-preview '
+  kubectl describe "$word" 2>/dev/null | sed -n "1,180p" ||
+  kubectl get "$word" -o yaml 2>/dev/null | sed -n "1,180p"
+'
+
+# Переменные окружения.
+zstyle ':fzf-tab:complete:(-parameter-|export|unset|expand):*' fzf-preview '
+  print -r -- ${(P)word}
+'
+
+# Команды.
+# Порядок:
+# 1. argc-completions spec: флаги, опции, аргументы, подкоманды
+# 2. tldr
+# 3. man
+# 4. which
+
+# Команды: argc-completions -> tldr -> man -> which.
+zstyle ':fzf-tab:complete:-command-:*' fzf-preview '
+  _argc_file=""
+
+  for _candidate in \
+    "$ARGC_COMPLETIONS_ROOT/completions/$word.sh" \
+    "$ARGC_COMPLETIONS_ROOT/completions/linux/$word.sh"
+  do
+    [[ -r "$_candidate" ]] && {
+      _argc_file="$_candidate"
+      break
+    }
+  done
+
+  if [[ -n "$_argc_file" ]]; then
+    {
+      print -r -- "argc-completions: $word"
+      print -r -- "source: $_argc_file"
+      print -r -- ""
+
+      awk "
+        /^# @cmd/ {
+          sub(/^# @cmd[ \t]*/, \"cmd     \")
+          print
+        }
+        /^# @flag/ {
+          sub(/^# @flag[ \t]*/, \"flag    \")
+          print
+        }
+        /^# @option/ {
+          sub(/^# @option[ \t]*/, \"option  \")
+          print
+        }
+        /^# @arg/ {
+          sub(/^# @arg[ \t]*/, \"arg     \")
+          print
+        }
+      " "$_argc_file" | sed -n "1,220p"
+    }
+  else
+    (tldr --color always "$word" 2>/dev/null) ||
+    (MANWIDTH=$FZF_PREVIEW_COLUMNS man "$word" 2>/dev/null | bat -plman --color=always 2>/dev/null) ||
+    (which "$word" 2>/dev/null)
+  fi
+'
+
+# Команды.
+zstyle ':fzf-tab:complete:-command-:*' fzf-preview '
+  (tldr --color always "$word" 2>/dev/null) ||
+  (MANWIDTH=$FZF_PREVIEW_COLUMNS man "$word" 2>/dev/null | bat -plman --color=always 2>/dev/null) ||
+  (which "$word" 2>/dev/null)
+'
+
+
 
 # -----------------------------------------------------------------------------
 # PLUGINS — keep existing base, add only workflow helpers
@@ -177,6 +401,22 @@ zinit ice depth=1
 zinit light zsh-users/zsh-completions
 
 zinit ice depth=1
+zinit light zpm-zsh/ssh
+
+if (( $+commands[npm] )); then
+  zinit ice depth=1
+  zinit light lukechilds/zsh-better-npm-completion
+
+  zinit ice depth=1
+  zinit light akoenig/npm-run.plugin.zsh
+fi
+
+if (( $+commands[rustup] )); then
+  zinit ice depth=1
+  zinit light pkulev/zsh-rustup-completion
+fi
+
+zinit ice depth=1
 zinit light wfxr/forgit
 
 zinit ice depth=1
@@ -188,11 +428,55 @@ zinit light chrissicool/zsh-256color
 zinit ice depth=1
 zinit light Tarrasch/zsh-bd
 
-# completion engine
+
+
+# -----------------------------------------------------------------------------
+# COMPLETION ENGINE
+# -----------------------------------------------------------------------------
 autoload -Uz compinit
+
 mkdir -p "$XDG_CACHE_HOME/zsh"
-compinit -d "$XDG_CACHE_HOME/zsh/.zcompdump-${ZSH_VERSION}"
+mkdir -p "$XDG_CACHE_HOME/zsh/zcompcache"
+
+_zcompdump="$XDG_CACHE_HOME/zsh/.zcompdump-${ZSH_VERSION}"
+
+if [[ -s "$_zcompdump" ]]; then
+  compinit -C -d "$_zcompdump"
+else
+  compinit -d "$_zcompdump"
+fi
+
+unset _zcompdump
+
 zmodload zsh/complist
+
+# -----------------------------------------------------------------------------
+# ARGC COMPLETIONS CACHE
+# -----------------------------------------------------------------------------
+_argc_zsh_cache="$XDG_CACHE_HOME/zsh/argc-completions.zsh"
+
+_argc_generate_cache() {
+  [[ -d "$ARGC_COMPLETIONS_ROOT/completions" ]] || return 1
+  (( $+commands[argc] )) || return 1
+
+  mkdir -p "$XDG_CACHE_HOME/zsh"
+
+  find "$ARGC_COMPLETIONS_ROOT/completions" \
+    -type f \
+    -name '*.sh' \
+    -printf '%P\n' 2>/dev/null |
+    sed 's/\.sh$//' |
+    sort -u |
+    xargs argc --argc-completions zsh >| "$_argc_zsh_cache"
+}
+
+if [[ -d "$ARGC_COMPLETIONS_ROOT" ]] && (( $+commands[argc] )); then
+  [[ -s "$_argc_zsh_cache" ]] || _argc_generate_cache
+  [[ -s "$_argc_zsh_cache" ]] && source "$_argc_zsh_cache"
+fi
+
+unset -f _argc_generate_cache
+unset _argc_zsh_cache
 
 # fzf-tab — keep in the correct order
 zinit ice depth=1
@@ -206,10 +490,6 @@ zinit ice depth=1
 zinit light hlissner/zsh-autopair
 
 
-# history search — load after syntax-highlighting
-zinit ice depth=1
-zinit light zsh-users/zsh-history-substring-search
-
 # -----------------------------------------------------------------------------
 # PLUGIN CONFIG
 # -----------------------------------------------------------------------------
@@ -220,17 +500,42 @@ ZVM_CURSOR_STYLE_ENABLED=true
 
 # autosuggestions
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=80
 ZSH_AUTOSUGGEST_USE_ASYNC=true
+ZSH_AUTOSUGGEST_COMPLETION_IGNORE='(git log *|git diff *|git show *|rg *|fd *|find *)'
 
 # you-should-use
 export YSU_MESSAGE_POSITION='after'
 export YSU_MODE='ALL'
 
+# auto-notify
+export AUTO_NOTIFY_THRESHOLD=20
+export AUTO_NOTIFY_EXPIRE_TIME=8000
+export AUTO_NOTIFY_ENABLE_SSH=0
+export AUTO_NOTIFY_CANCEL_ON_SIGINT=1
+
 # forgit
 export FORGIT_FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS"
 
 # fzf-tab
+zstyle ':fzf-tab:*' fzf-command fzf
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
+zstyle ':fzf-tab:*' fzf-flags --height=60% --layout=reverse --border --cycle --ansi
+zstyle ':fzf-tab:*' fzf-bindings 'ctrl-j:down' 'ctrl-k:up' 'ctrl-u:preview-half-page-up' 'ctrl-d:preview-half-page-down' 'ctrl-f:preview-page-down' 'ctrl-b:preview-page-up'
+zstyle ':fzf-tab:*' switch-group '<' '>'
+zstyle ':fzf-tab:*' continuous-trigger '/'
+zstyle ':fzf-tab:*' show-group full
+zstyle ':fzf-tab:*' prefix ''
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --level=2 --icons --color=always $realpath 2>/dev/null || ls -la $realpath 2>/dev/null'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --tree --level=2 --icons --color=always $realpath 2>/dev/null || ls -la $realpath 2>/dev/null'
+zstyle ':fzf-tab:complete:kill:argument-rest' fzf-preview 'ps -p $word -o pid,user,stat,comm,args -w -w 2>/dev/null'
+zstyle ':fzf-tab:complete:(ssh|scp|sftp):*' fzf-preview 'ssh -G ${word##*@} 2>/dev/null | sed -n "1,90p"'
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'systemctl status $word --no-pager --full 2>/dev/null'
+zstyle ':fzf-tab:complete:git-(add|diff|restore|checkout|switch):*' fzf-preview 'git diff --color=always -- $word 2>/dev/null || git log --oneline --decorate --color=always -20 -- $word 2>/dev/null'
+zstyle ':fzf-tab:complete:(npm|pnpm):*' fzf-preview 'if [[ -f package.json ]]; then jq -r ".scripts // {} | to_entries[] | \"\(.key)\t\(.value)\"" package.json 2>/dev/null || sed -n "1,120p" package.json; fi'
+zstyle ':fzf-tab:complete:(cargo|rustup):*' fzf-preview 'case "$group" in *command*) "$words[1]" "$word" --help 2>/dev/null | sed -n "1,120p" ;; *) print -r -- "$group: $word" ;; esac'
+zstyle ':fzf-tab:complete:uv:*' fzf-preview 'case "$group" in *command*) uv "$word" --help 2>/dev/null | sed -n "1,120p" ;; *) print -r -- "$group: $word" ;; esac'
+zstyle ':fzf-tab:complete:docker:*' fzf-preview 'docker inspect $word 2>/dev/null | sed -n "1,120p" || docker ps -a --filter "name=$word" --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}" 2>/dev/null'
 # =============================================================================
 # zsh-vi-mode hook — перепривязываем Tab ПОСЛЕ того как ZVM перезапишет биндинги
 # =============================================================================
@@ -272,10 +577,11 @@ zinit light zsh-vi-more/evil-registers
 zinit ice depth=1
 zinit light zdharma-continuum/fast-syntax-highlighting
 
+# history search — load after syntax-highlighting
+zinit ice depth=1
+zinit light zsh-users/zsh-history-substring-search
 
-if command -v carapace >/dev/null 2>&1; then
-  source <(carapace _carapace)
-fi
+
 
 # -----------------------------------------------------------------------------
 # Удобные алиасы под root repo
@@ -287,12 +593,20 @@ alias cdu='cd-gitroot'
 # EXTERNAL TOOLS INIT (guarded)
 # -----------------------------------------------------------------------------
 (( $+commands[tmuxifier] )) && eval "$(tmuxifier init -)"
-(( $+commands[fzf] )) && eval "$(fzf --zsh)"
+# fzf's generated zsh init can try to restore the read-only `zle` option.
+(( $+commands[fzf] )) && eval "$(fzf --zsh)" 2>/dev/null
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 (( $+commands[thefuck] )) && eval "$(thefuck --alias fuck)"
-(( $+commands[starship] )) && eval "$(starship init zsh)"
 (( $+commands[direnv] )) && eval "$(direnv hook zsh)"
-(( $+commands[just] )) && source <(just --completions zsh 2>/dev/null)
+
+# Prefer focused native/plugin completions where they beat the generic carapace fallback.
+(( $+functions[_zbnc_zsh_better_npm_completion] )) && compdef _zbnc_zsh_better_npm_completion npm
+(( $+functions[_zbnc_zsh_better_npm_completion_npx] )) && compdef _zbnc_zsh_better_npm_completion_npx npx
+autoload -Uz _git _ssh 2>/dev/null
+compdef _git git 2>/dev/null
+compdef _ssh ssh scp sftp sshfs mosh 2>/dev/null
+
+(( $+commands[starship] )) && eval "$(starship init zsh)"
 
 # history substring search
 bindkey -M viins "$terminfo[kcuu1]" history-substring-search-up
@@ -314,6 +628,34 @@ bindkey -M vicmd 'j' history-substring-search-down
 # -----------------------------------------------------------------------------
 # FUNCTIONS
 # -----------------------------------------------------------------------------
+function argc-refresh() {
+  local cache_file="$XDG_CACHE_HOME/zsh/argc-completions.zsh"
+
+  if [[ ! -d "$ARGC_COMPLETIONS_ROOT" ]]; then
+    print -P "%F{red}argc-completions: directory not found: $ARGC_COMPLETIONS_ROOT%f"
+    return 1
+  fi
+
+  if [[ -d "$ARGC_COMPLETIONS_ROOT/.git" ]]; then
+    git -C "$ARGC_COMPLETIONS_ROOT" pull --ff-only
+  fi
+
+  "$ARGC_COMPLETIONS_ROOT/scripts/download-tools.sh"
+
+  mkdir -p "$XDG_CACHE_HOME/zsh"
+
+  find "$ARGC_COMPLETIONS_ROOT/completions" \
+    -type f \
+    -name '*.sh' \
+    -printf '%P\n' 2>/dev/null |
+    sed 's/\.sh$//' |
+    sort -u |
+    xargs argc --argc-completions zsh >| "$cache_file"
+
+  rm -f "$XDG_CACHE_HOME/zsh/.zcompdump-"*
+
+  print -P "%F{green}argc-completions cache rebuilt.%f Run: exec zsh"
+}
 # Yazi cwd jump (kept)
 function y() {
   local tmp="$(mktemp -t 'yazi-cwd.XXXXXX')" cwd
@@ -750,3 +1092,5 @@ function zvm_after_lazy_keybindings() {
 # LOCAL OVERRIDES
 # -----------------------------------------------------------------------------
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+path=("$HOME/go/bin" "$HOME/.local/bin" $path)
+[[ -r "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"

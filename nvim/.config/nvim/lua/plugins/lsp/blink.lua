@@ -1,375 +1,319 @@
-local completion = require("config.completion")
+-- Filename: ~/github/dotfiles-latest/neovim/neobean/lua/plugins/blink-cmp.lua
+-- ~/github/dotfiles-latest/neovim/neobean/lua/plugins/blink-cmp.lua
 
-local function border_style()
-	if vim.o.pumborder ~= "" then
-		return vim.o.pumborder
-	end
-	if vim.o.winborder ~= "" then
-		return vim.o.winborder
-	end
-	return "rounded"
-end
+-- HACK: blink.cmp updates | Remove LuaSnip | Emoji and Dictionary Sources | Fix Jump Autosave Issue
+-- https://youtu.be/JrgfpWap_Pg
+-- completion plugin with support for LSPs and external sources that updates
+-- on every keystroke with minimal overhead
+-- https://www.lazyvim.org/extras/coding/blink
+-- https://github.com/saghen/blink.cmp
+-- Documentation site: https://cmp.saghen.dev/
+-- NOTE: Specify the trigger character(s) used for luasnip
 
-local function dictionary_dir()
-	return vim.fn.stdpath("config") .. "/dict"
-end
-
-local function setup_blink_highlights()
-	local highlights = {
-		BlinkCmpMenu = { fg = "#d8dee9", bg = "#2b303b" },
-		BlinkCmpMenuBorder = { fg = "#4c566a", bg = "#2b303b" },
-		BlinkCmpMenuSelection = { fg = "#eceff4", bg = "#3b4252", bold = true },
-		BlinkCmpLabel = { fg = "#e5e9f0", bg = "#2b303b" },
-		BlinkCmpLabelDescription = { fg = "#81a1c1", bg = "#2b303b", italic = true },
-		BlinkCmpSource = { fg = "#88c0d0", bg = "#2b303b" },
-		BlinkCmpGhostText = { fg = "#616e88", italic = true },
-		BlinkCmpDoc = { fg = "#d8dee9", bg = "#2e3440" },
-		BlinkCmpDocBorder = { fg = "#4c566a", bg = "#2e3440" },
-		BlinkCmpSignatureHelp = { fg = "#d8dee9", bg = "#2e3440" },
-		BlinkCmpSignatureHelpBorder = { fg = "#4c566a", bg = "#2e3440" },
-		BlinkCmpItemIdx = { fg = "#5e81ac", bg = "#2b303b", bold = true },
-	}
-
-	for group, value in pairs(highlights) do
-		vim.api.nvim_set_hl(0, group, value)
-	end
-end
-
-local function setup_blink_autocmds()
-	local group = vim.api.nvim_create_augroup("BlinkCmpPolish", { clear = true })
-
-	vim.api.nvim_create_autocmd("ColorScheme", {
-		group = group,
-		callback = setup_blink_highlights,
-	})
-
-	vim.api.nvim_create_autocmd("User", {
-		group = group,
-		pattern = "BlinkCmpMenuOpen",
-		callback = function()
-			local ok, suggestion = pcall(require, "copilot.suggestion")
-			if ok and type(suggestion.dismiss) == "function" then
-				suggestion.dismiss()
-			end
-			vim.b.copilot_suggestion_hidden = true
-		end,
-	})
-
-	vim.api.nvim_create_autocmd("User", {
-		group = group,
-		pattern = "BlinkCmpMenuClose",
-		callback = function()
-			vim.b.copilot_suggestion_hidden = false
-		end,
-	})
-
-	setup_blink_highlights()
-end
-
-local function blink_enabled()
-	if not completion.is_blink() then
-		return false
-	end
-
-	local filetype = vim.bo[0].filetype
-	return not vim.tbl_contains({
-		"TelescopePrompt",
-		"minifiles",
-		"snacks_picker_input",
-	}, filetype)
-end
-
-local function path_kind_icon(ctx)
-	local icon = ctx.kind_icon
-	if vim.tbl_contains({ "Path" }, ctx.source_name) then
-		local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
-		if dev_icon then
-			icon = dev_icon
-		end
-	else
-		icon = require("lspkind").symbolic(ctx.kind, { mode = "symbol" })
-	end
-	return " " .. icon .. ctx.icon_gap
-end
-
-local function path_kind_highlight(ctx)
-	if vim.tbl_contains({ "Path" }, ctx.source_name) then
-		local _, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
-		if dev_hl then
-			return dev_hl
-		end
-	end
-	return ctx.kind_hl
-end
-
+local trigger_text = ";"
 return {
-	{
-		"zbirenbaum/copilot.lua",
-		cmd = "Copilot",
-		event = "InsertEnter",
-		opts = function()
-			local coq_mode = completion.is_coq()
+    {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
+        opts = {
+            suggestion = { enabled = false },
+            panel = { enabled = false },
+            filetypes = {
+                markdown = false,
+                tex = false,
+                help = true,
+            },
+        },
+    },
+    {
+        "saghen/blink.cmp",
+        version = "*",
+        enabled = true,
+        -- In case there are breaking changes and you want to go back to the last
+        -- working release
+        -- https://github.com/Saghen/blink.cmp/releases
+        dependencies = {
+            "L3MON4D3/LuaSnip",
+            "moyiz/blink-emoji.nvim",
+            "onsails/lspkind.nvim",
+            "Kaiser-Yang/blink-cmp-dictionary",
+            "fang2hou/blink-copilot",
+            "mikavilpas/blink-ripgrep.nvim",
+        },
 
-			return {
-				suggestion = {
-					enabled = coq_mode,
-					auto_trigger = false,
-					hide_during_completion = true,
-					keymap = {
-						accept = false,
-						accept_word = false,
-						accept_line = false,
-						next = false,
-						prev = false,
-						dismiss = false,
-					},
-				},
-				panel = { enabled = false },
-				filetypes = {
-					markdown = false,
-					tex = false,
-					help = true,
-				},
-			}
-		end,
-	},
-	{
-		"saghen/blink.cmp",
-		version = "*",
-		enabled = blink_enabled,
-		dependencies = {
-			"onsails/lspkind.nvim",
-			"moyiz/blink-emoji.nvim",
-			"Kaiser-Yang/blink-cmp-dictionary",
-			"fang2hou/blink-copilot",
-			"mikavilpas/blink-ripgrep.nvim",
-		},
-		init = setup_blink_autocmds,
-		opts = function(_, opts)
-			opts.enabled = blink_enabled
-			opts.snippets = nil
+        opts = function(_, opts)
+            -- I noticed that telescope was extremeley slow and taking too long to open,
+            -- assumed related to blink, so disabled blink and in fact it was related
+            -- :lua print(vim.bo[0].filetype)
+            -- So I'm disabling blink.cmp for Telescope
 
-			opts.keymap = vim.tbl_deep_extend("force", opts.keymap or {}, {
-				preset = "enter",
-				["<C-y>"] = { "select_and_accept", "fallback" },
-				["<C-u>"] = { "scroll_documentation_up", "fallback" },
-				["<C-d>"] = { "scroll_documentation_down", "fallback" },
-			})
+            opts.enabled = function()
+                -- Get the current buffer's filetype
+                local filetype = vim.bo[0].filetype
+                -- Disable for Telescope buffers
 
-			opts.sources = vim.tbl_deep_extend("force", opts.sources or {}, {
-				default = {
-					"lsp",
-					"path",
-					"buffer",
-					"copilot",
-					"emoji",
-					"dictionary",
-					"ripgrep",
-				},
-				per_filetype = {
-					lua = { inherit_defaults = true, "lsp", "path", "buffer", "copilot", "ripgrep" },
-					markdown = { "buffer", "path", "dictionary", "emoji", "ripgrep", "copilot" },
-					text = { "buffer", "dictionary", "emoji", "ripgrep" },
-					gitcommit = { "buffer", "dictionary", "emoji", "ripgrep" },
-					tex = { "buffer", "path", "dictionary", "ripgrep" },
-				},
-				providers = {
-					copilot = {
-						name = "AI",
-						module = "blink-copilot",
-						min_keyword_length = 3,
-						score_offset = 120,
-						max_items = 4,
-						async = true,
-					},
-					lsp = {
-						name = "LSP",
-						module = "blink.cmp.sources.lsp",
-						min_keyword_length = 0,
-						score_offset = 100,
-						fallbacks = {},
-					},
-					path = {
-						name = "Path",
-						module = "blink.cmp.sources.path",
-						score_offset = 110,
-						min_keyword_length = 0,
-						fallbacks = { "buffer" },
-						opts = {
-							trailing_slash = false,
-							label_trailing_slash = true,
-							get_cwd = function(context)
-								return vim.fn.expand(("#%d:p:h"):format(context.bufnr))
-							end,
-							show_hidden_files_by_default = true,
-						},
-					},
-					buffer = {
-						name = "Buf",
-						module = "blink.cmp.sources.buffer",
-						min_keyword_length = 3,
-						max_items = 5,
-						score_offset = 20,
-					},
-					emoji = {
-						name = "Emoji",
-						module = "blink-emoji",
-						min_keyword_length = 2,
-						max_items = 8,
-						score_offset = 15,
-						opts = {
-							insert = true,
-						},
-					},
-					dictionary = {
-						name = "Dict",
-						module = "blink-cmp-dictionary",
-						min_keyword_length = 3,
-						max_items = 6,
-						score_offset = 12,
-						opts = {
-							force_fallback = true,
-							dictionary_directories = { dictionary_dir() },
-						},
-					},
-					ripgrep = {
-						name = "RG",
-						module = "blink-ripgrep",
-						min_keyword_length = 4,
-						max_items = 5,
-						async = true,
-						score_offset = 10,
-						opts = {
-							prefix_min_len = 4,
-							project_root_marker = ".git",
-							fallback_to_regex_highlighting = true,
-							backend = {
-								use = "gitgrep-or-ripgrep",
-								customize_icon_highlight = true,
-								ripgrep = {
-									context_size = 4,
-									max_filesize = "1M",
-									project_root_fallback = true,
-									search_casing = "--smart-case",
-									additional_paths = {},
-									additional_rg_options = {},
-									ignore_paths = {},
-								},
-							},
-							gitgrep = {
-								additional_gitgrep_options = {},
-							},
-							debug = false,
-						},
-					},
-				},
-			})
+                if filetype == "TelescopePrompt" or filetype == "minifiles" or filetype == "snacks_picker_input" or filetype == "tex" then
+                    return false
+                end
+                return true
+            end
+            -- NOTE: The new way to enable LuaSnip
+            -- Merge custom sources with the existing ones from lazyvim
+            -- NOTE: by default lazyvim already includes the lazydev source, so not adding it here again
+            opts.snippets = { snippets = { preset = "luasnip" } }
 
-			opts.cmdline = vim.tbl_deep_extend("force", opts.cmdline or {}, {
-				enabled = true,
-				keymap = {
-					preset = "cmdline",
-					["<CR>"] = { "accept_and_enter", "fallback" },
-				},
-				completion = {
-					ghost_text = { enabled = true },
-					menu = {
-						auto_show = function()
-							return vim.fn.getcmdtype() == ":"
-						end,
-					},
-				},
-			})
+            opts.sources = vim.tbl_deep_extend("force", opts.sources or {}, {
+                -- The trigger_characters option is removed from here as we want snippets to show always
 
-			opts.signature = {
-				enabled = true,
-				window = { border = border_style() },
-			}
+                default = {
+                    "lsp",
+                    "path",
+                    "buffer",
+                    "emoji",
+                    --			"dictionary",
+                    "copilot",
+                    --"snippets",
+                    --"ripgrep",
+                },
 
-			opts.completion = vim.tbl_deep_extend("force", opts.completion or {}, {
-				accept = {
-					auto_brackets = {
-						enabled = true,
-					},
-				},
-				keyword = {
-					range = "full",
-				},
-				trigger = {
-					show_on_trigger_character = true,
-					show_on_insert_on_trigger_character = true,
-					show_on_accept_on_trigger_character = true,
-				},
-				ghost_text = {
-					enabled = function()
-						return not vim.tbl_contains({ "markdown", "text", "gitcommit" }, vim.bo.filetype)
-					end,
-				},
-				list = {
-					selection = {
-						preselect = false,
-						auto_insert = false,
-					},
-				},
-				menu = {
-					border = border_style(),
-					auto_show = true,
-					auto_show_delay_ms = function()
-						if vim.bo.filetype == "markdown" then
-							return 120
-						end
-						return 60
-					end,
-					draw = {
-						columns = {
-							{ "item_idx" },
-							{ "kind_icon" },
-							{ "label", "label_description", gap = 1 },
-							{ "source_name" },
-						},
-						components = {
-							item_idx = {
-								text = function(ctx)
-									if ctx.idx == 10 then
-										return "0"
-									end
-									if ctx.idx > 10 then
-										return " "
-									end
-									return tostring(ctx.idx)
-								end,
-								highlight = "BlinkCmpItemIdx",
-							},
-							label = {
-								width = { fill = true, max = 48 },
-							},
-							label_description = {
-								width = { max = 32 },
-							},
-							kind_icon = {
-								text = path_kind_icon,
-								highlight = path_kind_highlight,
-							},
-							source_name = {
-								width = { max = 8 },
-								text = function(ctx)
-									return "[" .. ctx.source_name .. "]"
-								end,
-								highlight = "BlinkCmpSource",
-							},
-						},
-					},
-				},
-				documentation = {
-					auto_show = true,
-					auto_show_delay_ms = 180,
-					window = {
-						border = border_style(),
-					},
-				},
-			})
+                providers = {
+                    -- snippets = {
+                    -- 	name = "[snip]",
+                    -- 	min_keyword_length = 1,
+                    -- 	score_offset = -1,
+                    -- 	opts = {
+                    -- 		clipboard_register = "+", -- register to use for `$CLIPBOARD`
+                    -- 		show_autosnippets = false,
+                    -- 	},
+                    -- },
+                    -- ripgrep = {
+                    -- 	module = "blink-ripgrep",
+                    -- 	name = "Ripgrep",
+                    -- 	-- see the full configuration below for all available options
+                    -- 	---@module "blink-ripgrep"
+                    -- 	---@type blink-ripgrep.Options
+                    -- 	opts = {
+                    -- 		prefix_min_len = 3,
+                    -- 	},
+                    -- },
+                    copilot = {
+                        name = "copilot",
+                        module = "blink-copilot",
+                        min_keyword_length = 3,
+                        score_offset = 100,
+                        async = true,
+                    },
+                    lsp = {
+                        name = "lsp",
+                        enabled = true,
+                        module = "blink.cmp.sources.lsp",
+                        min_keyword_length = 0,
+                        -- When linking markdown notes, I would get snippets and text in the
+                        -- suggestions, I want those to show only if there are no LSP
+                        -- suggestions
+                        --
+                        -- Enabled fallbacks as this seems to be working now
+                        -- Disabling fallbacks as my snippets wouldn't show up when editing
+                        -- lua files
+                        -- fallbacks = { "snippets", "buffer" },
+                        score_offset = 99, -- the higher the number, the higher the priority
+                    },
+                    path = {
+                        name = "Path",
+                        module = "blink.cmp.sources.path",
+                        score_offset = 100,
+                        -- When typing a path, I would get snippets and text in the
+                        -- suggestions, I want those to show only if there are no path
+                        -- suggestions
+                        fallbacks = { "snippets", "buffer" },
+                        min_keyword_length = 0,
+                        opts = {
+                            trailing_slash = false,
+                            label_trailing_slash = true,
+                            get_cwd = function(context)
+                                return vim.fn.expand(("#%d:p:h"):format(context.bufnr))
+                            end,
+                            show_hidden_files_by_default = true,
+                        },
+                    },
+                    buffer = {
+                        name = "Buffer",
+                        enabled = true,
+                        max_items = 3,
+                        module = "blink.cmp.sources.buffer",
+                        min_keyword_length = 2,
+                        score_offset = 15, -- the higher the number, the higher the priority
+                    },
+                    -- Example on how to configure dadbod found in the main repo
+                    -- https://github.com/kristijanhusak/vim-dadbod-completion
+                    -- https://github.com/moyiz/blink-emoji.nvim
+                    emoji = {
+                        module = "blink-emoji",
+                        name = "Emoji",
+                        score_offset = 89,        -- the higher the number, the higher the priority
+                        min_keyword_length = 2,
+                        opts = { insert = true }, -- Insert emoji (default) or complete its name
+                    },
+                    -- https://github.com/Kaiser-Yang/blink-cmp-dictionary
+                    -- In macOS to get started with a dictionary:
+                    -- cp /usr/share/dict/words ~/github/dotfiles-latest/dictionaries/words.txt
+                    --
+                    -- NOTE: For the word definitions make sure "wn" is installed
+                    -- brew install wordnet
+                    -- dictionary = {
+                    -- 	module = "blink-cmp-dictionary",
+                    -- 	name = "Dict",
+                    -- 	-- https://github.com/Kaiser-Yang/blink-cmp-dictionary/issues/2
+                    -- 	min_keyword_length = 2,
+                    -- 	opts = {
+                    -- 		-- -- The dictionary by default now uses fzf, make sure to have it
+                    -- 		-- -- installed
+                    -- 		-- -- https://github.com/Kaiser-Yang/blink-cmp-dictionary/issues/2
+                    -- 		--
+                    -- 		-- Do not specify a file, just the path, and in the path you need to
+                    -- 		-- have your .txt files
+                    -- 		dictionary_directories = { vim.fn.expand("~/.config/nvim/dict") },
+                    -- 		-- Notice I'm also adding the words I add to the spell dictionary
+                    -- 		-- --  NOTE: To disable the definitions uncomment this section below
+                    -- 		--
+                    -- 		-- separate_output = function(output)
+                    -- 		--   local items = {}
+                    -- 		--   for line in output:gmatch("[^\r\n]+") do
+                    -- 		--     table.insert(items, {
+                    -- 		--       label = line,
+                    -- 		--       insert_text = line,
+                    -- 		--       documentation = nil,
+                    -- 		--     })
+                    -- 		--   end
+                    -- 		--   return items
+                    -- 		-- end,
+                    -- 	},
+                    -- },
+                    -- -- Third class citizen mf always talking shit
+                    -- copilot = {
+                    --   name = "copilot",
+                    --   enabled = true,
+                    --   module = "blink-cmp-copilot",
+                    --   kind = "Copilot",
+                    --   min_keyword_length = 6,
+                    --   score_offset = -100, -- the higher the number, the higher the priority
+                    --   async = true,
+                    -- },
+                },
+            })
+            opts.cmdline = {
+                enabled = true,
+            }
+            opts.completion = {
+                accept = {
+                    auto_brackets = {
+                        enabled = true,
+                        --default_brackets = { ";", "" },
+                        --override_brackets_for_filetypes = {
+                        --	markdown = { ";", "" },
+                        --},
+                    },
+                },
+                keyword = {
+                    -- 'prefix' will fuzzy match on the text before the cursor
+                    -- 'full' will fuzzy match on the text before *and* after the cursor
+                    -- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
+                    range = "full",
+                },
+                ghost_text = { enabled = false },
+                menu = {
+                    border = "single",
+                    draw = {
+                        components = {
+                            kind_icon = {
+                                text = function(ctx)
+                                    local icon = ctx.kind_icon
+                                    if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                                        local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
+                                        if dev_icon then
+                                            icon = dev_icon
+                                        end
+                                    else
+                                        icon = require("lspkind").symbolic(ctx.kind, {
+                                            mode = "symbol",
+                                        })
+                                    end
 
-			return opts
-		end,
-	},
+                                    return icon .. ctx.icon_gap
+                                end,
+
+                                -- Optionally, use the highlight groups from nvim-web-devicons
+                                -- You can also add the same function for `kind.highlight` if you want to
+                                -- keep the highlight groups in sync with the icons.
+                                highlight = function(ctx)
+                                    local hl = ctx.kind_hl
+                                    if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                                        local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+                                        if dev_icon then
+                                            hl = dev_hl
+                                        end
+                                    end
+                                    return hl
+                                end,
+                            },
+                        },
+                    },
+                },
+                documentation = {
+                    auto_show = true,
+                    window = {
+                        border = "single",
+                    },
+                },
+                list = {
+                    selection = {
+                        preselect = true,
+                        auto_insert = true,
+                    },
+                },
+            }
+            -- opts.fuzzy = {
+            --   -- Disabling this matches the behavior of fzf
+            --   use_typo_resistance = false,
+            --   -- Frecency tracks the most recently/frequently used items and boosts the score of the item
+            --   use_frecency = true,
+            --   -- Proximity bonus boosts the score of items matching nearby words
+            --   use_proximity = false,
+            -- }
+            -- -- To specify the options for snippets
+            -- opts.sources.providers.snippets.opts = {
+            --   use_show_condition = true, -- Enable filtering of snippets dynamically
+            --   show_autosnippets = true, -- Display autosnippets in the completion menu
+            -- }
+            -- The default preset used by lazyvim accepts completions with enter
+            -- I don't like using enter because if on markdown and typing
+            -- something, but you want to go to the line below, if you press enter,
+            -- the completion will be accepted
+            -- https://cmp.saghen.dev/configuration/keymap.html#default
+
+            opts.keymap = {
+                preset = "enter",
+            }
+            return opts
+        end,
+    },
+    --{
+    --	"saghen/blink.pairs",
+    --	version = "*", -- (recommended) only required with prebuilt binaries
+
+    --	-- download prebuilt binaries from github releases
+    --	dependencies = "saghen/blink.download",
+    --	-- OR build from source, requires nightly:
+    --	-- https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+    --	-- build = 'cargo build --release',
+    --	-- If you use nix, you can build from source using latest nightly rust with:
+    --	-- build = 'nix run .#build-plugin',
+
+    --	opts = {
+    --		mappings = {
+    --			disabled_filetypes = { "tex" },
+    --		},
+    --	},
+    --},
 }
