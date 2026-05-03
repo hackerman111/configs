@@ -1,0 +1,58 @@
+# ==========================================
+# Идеальный конфиг Ghostty (Tmux + Nvim + Zsh)
+# с кастомной темой Nord
+# ==========================================
+
+# --- Оболочка по умолчанию ---
+command = /bin/zsh
+
+# --- Шрифты ---
+font-family = "MesloLGM Nerd Font"
+font-size = 14
+# Добавляет немного воздуха между строками кода (полезно для Nvim)
+
+# --- Внешний вид окна ---
+background-opacity = 0.9
+# Отключаем системные рамки окна (всю навигацию берет на себя статус-бар Tmux)
+window-decoration = false 
+background-opacity-cells = true
+
+# --- Курсор и мышь ---
+cursor-style = block
+cursor-style-blink = false
+mouse-hide-while-typing = true
+
+# --- Кастомная тема Nord ---
+foreground = #D8DEE9
+background = #2E3440
+selection-foreground = #000000
+selection-background = #FFFACD
+cursor-color = #81A1C1
+
+# Палитра цветов (color0 - color15)
+palette = 0=#3B4252
+palette = 1=#BF616A
+palette = 2=#A3BE8C
+palette = 3=#EBCB8B
+palette = 4=#81A1C1
+palette = 5=#B48EAD
+palette = 6=#88C0D0
+palette = 7=#E5E9F0
+palette = 8=#4C566A
+palette = 9=#BF616A
+palette = 10=#A3BE8C
+palette = 11=#EBCB8B
+palette = 12=#81A1C1
+palette = 13=#B48EAD
+palette = 14=#8FBCBB
+palette = 15=#ECEFF4
+
+# --- Горячие клавиши ---
+# Отключаем все дефолтные бинды Ghostty, чтобы не конфликтовали с tmux-prefix или Nvim
+keybind = clear
+
+# Оставляем только базовое управление самим эмулятором
+keybind = ctrl+shift+c=copy_to_clipboard
+keybind = ctrl+shift+v=paste_from_clipboard
+keybind = ctrl+zero=reset_font_size
+keybind = super+f=toggle_fullscreen
