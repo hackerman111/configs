@@ -4,7 +4,7 @@ return {
 	-- 1. Основная конфигурация Telescope и его расширений
 	{
 		"nvim-telescope/telescope.nvim",
-		version = "0.1.6",
+		version = "0.1.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-ui-select.nvim",

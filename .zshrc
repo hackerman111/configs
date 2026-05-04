@@ -32,7 +32,6 @@ export PATH="$HOME/tools/llvm-project/build/bin:$PATH"
 export LD_LIBRARY_PATH="$HOME/tools/llvm-project/build/lib:$LD_LIBRARY_PATH"
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.tmuxifier/bin:$PATH"
 export PATH="$HOME/.opencode/bin:$PATH"
 # tmux-open-nvim helper script (available right after TPM plugin install)
 export PATH="$HOME/.tmux/plugins/tmux-open-nvim/scripts:$PATH"
@@ -1088,6 +1087,10 @@ function zvm_after_lazy_keybindings() {
   zvm_bindkey vicmd "$terminfo[kcud1]" history-substring-search-down
 }
 
+# Автозапуск tmux
+if [[ -z "$TMUX" ]] && [[ $- == *i* ]]; then
+    exec tmux new-session 
+fi
 # -----------------------------------------------------------------------------
 # LOCAL OVERRIDES
 # -----------------------------------------------------------------------------

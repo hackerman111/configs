@@ -223,7 +223,7 @@ print_section "6. Установка терминалов и оболочки"
 
 TERMINAL_PACKAGES=(
     kitty              # Основной терминал
-    wezterm            # Основной tmux-first terminal workflow
+    ghostty
     alacritty          # Альтернативный терминал
     tmux               # Мультиплексор терминала
     zsh                # Z Shell
