@@ -3,7 +3,6 @@
 
 -- I want to change the default notifications to be less obtrussive (if that's even a word)
 -- https://github.com/folke/noice.nvim
-
 return {
     {
         "folke/noice.nvim",
@@ -72,4 +71,8 @@ return {
             },
         },
     },
+    require("notify").setup({
+        background_colour = "#000000",
+    })
+
 }

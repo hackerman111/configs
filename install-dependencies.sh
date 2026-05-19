@@ -1023,21 +1023,15 @@ AUR_PACKAGES=(
     obsidian
     xkb-switch         # Переключатель раскладки (полезно для Neovim)
     neofetch
-    # Все пакеты из pkglist-aur.txt
     adguardvpn-cli-bin
-    agg
     aimp
     amneziavpn-bin
     antigravity
-    carapace-bin
-    clash-verge-rev-bin
     cloudflare-warp-bin
     djvu2pdf
-    google-chrome
     grub-customizer
     hiddify-app-bin
     iprange
-    jdownloader2
     latex-mk
     localsend-bin
     logiops
@@ -1046,13 +1040,12 @@ AUR_PACKAGES=(
     scantailor-advanced-git
     sing-box
     throne-bin
-    visual-studio-code-bin
     v2raya-bin
     yandex-browser
     yay-bin
-    xfce4-artwork
-    xfwm4-themes
     zotero-git
+    ventoy-bin
+    librewolf-bin
 )
 
 print_info "Установка из AUR: ${AUR_PACKAGES[*]}"

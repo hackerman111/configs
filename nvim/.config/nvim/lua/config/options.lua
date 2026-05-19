@@ -5,6 +5,10 @@ vim.cmd("set termguicolors")
 --vim.cmd("set clipboard+=unnamedplus")
 vim.api.nvim_command("highlight BoldUnderline guisp=white guifg=white gui=bold,underline")
 
+vim.g.vimtex_syntax_enabled = 0
+vim.g.vimtex_complete_enabled = 0
+
+
 -- Внешний вид
 opt.number = true         -- Показывать номера строк
 opt.relativenumber = true -- Показывать относительные номера строк

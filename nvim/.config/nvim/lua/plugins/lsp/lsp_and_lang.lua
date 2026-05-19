@@ -500,16 +500,16 @@ return {
 
             -- THEN set the statusline
             vim.opt.statusline = table.concat({
-                "%{v:lua.git_branch()}", -- Git branch
-                "%f",              -- File name
-                "%m",              -- Modified flag
-                "%r",              -- Readonly flag
-                "%=",              -- Right align
-                "%{v:lua.linter_status()}", -- Linter status
+                "%{v:lua.git_branch()}",       -- Git branch
+                "%f",                          -- File name
+                "%m",                          -- Modified flag
+                "%r",                          -- Readonly flag
+                "%=",                          -- Right align
+                "%{v:lua.linter_status()}",    -- Linter status
                 "%{v:lua.formatter_status()}", -- Formatter status
-                "%{v:lua.lsp_status()}", -- LSP status
-                " %l:%c",          -- Line:Column
-                " %p%%",           -- Percentage through file
+                "%{v:lua.lsp_status()}",       -- LSP status
+                " %l:%c",                      -- Line:Column
+                " %p%%",                       -- Percentage through file
             }, " ")
         end,
     },

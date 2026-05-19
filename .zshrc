@@ -43,8 +43,8 @@ typeset -U path fpath
 # HISTORY
 # -----------------------------------------------------------------------------
 export HISTFILE="${HISTFILE:-$HOME/.histfile}"
-HISTSIZE=200000
-SAVEHIST=200000
+HISTSIZE=9000000
+SAVEHIST=9000000
 HISTDUP=erase
 
 setopt APPEND_HISTORY
@@ -103,6 +103,7 @@ alias tls='tmux ls'
 alias ts='tmux new-session -A -s'
 alias vp='nmcli connection up'
 alias vd='nmcli connection down'
+alias q= 'exit'
 
 # safer defaults
 alias mkdir='mkdir -p'
@@ -237,6 +238,23 @@ zstyle ':fzf-tab:complete:*:*' fzf-preview '
     esac
   else
     print -r -- "$desc"
+  fi
+'
+
+# pacman / yay: показ информации о пакете в fzf-preview
+zstyle ':fzf-tab:complete:(pacman|yay):*' fzf-preview '
+  # Если это не флаг (не начинается с дефиса), пытаемся показать инфо о пакете
+  if [[ ! "$word" =~ ^- ]]; then
+    # Пробуем получить инфо из репозиториев (Si), если нет - из установленных (Qi)
+    { pacman -Si "$word" 2>/dev/null || pacman -Qi "$word" 2>/dev/null; } |
+      if (( $+commands[bat] )); then
+        bat --style=plain --color=always --line-range :150
+      else
+        sed -n "1,150p"
+      fi
+  else
+    # Если это флаг, показываем help
+    "$words[1]" --help 2>/dev/null | sed -n "1,150p"
   fi
 '
 
@@ -432,10 +450,17 @@ zinit light Tarrasch/zsh-bd
 # -----------------------------------------------------------------------------
 # COMPLETION ENGINE
 # -----------------------------------------------------------------------------
-autoload -Uz compinit
 
+fpath=(
+  /usr/share/zsh/site-functions
+  /usr/share/zsh/functions/Completion/Unix
+  $fpath
+)
+
+typeset -U fpath
+
+autoload -Uz compinit
 mkdir -p "$XDG_CACHE_HOME/zsh"
-mkdir -p "$XDG_CACHE_HOME/zsh/zcompcache"
 
 _zcompdump="$XDG_CACHE_HOME/zsh/.zcompdump-${ZSH_VERSION}"
 
@@ -447,7 +472,9 @@ fi
 
 unset _zcompdump
 
-zmodload zsh/complist
+# Явно привязать native completions
+(( $+functions[_pacman] )) && compdef _pacman pacman
+(( $+functions[_yay] )) && compdef _yay yay
 
 # -----------------------------------------------------------------------------
 # ARGC COMPLETIONS CACHE
@@ -516,25 +543,6 @@ export AUTO_NOTIFY_CANCEL_ON_SIGINT=1
 # forgit
 export FORGIT_FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS"
 
-# fzf-tab
-zstyle ':fzf-tab:*' fzf-command fzf
-zstyle ':fzf-tab:*' use-fzf-default-opts yes
-zstyle ':fzf-tab:*' fzf-flags --height=60% --layout=reverse --border --cycle --ansi
-zstyle ':fzf-tab:*' fzf-bindings 'ctrl-j:down' 'ctrl-k:up' 'ctrl-u:preview-half-page-up' 'ctrl-d:preview-half-page-down' 'ctrl-f:preview-page-down' 'ctrl-b:preview-page-up'
-zstyle ':fzf-tab:*' switch-group '<' '>'
-zstyle ':fzf-tab:*' continuous-trigger '/'
-zstyle ':fzf-tab:*' show-group full
-zstyle ':fzf-tab:*' prefix ''
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --level=2 --icons --color=always $realpath 2>/dev/null || ls -la $realpath 2>/dev/null'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --tree --level=2 --icons --color=always $realpath 2>/dev/null || ls -la $realpath 2>/dev/null'
-zstyle ':fzf-tab:complete:kill:argument-rest' fzf-preview 'ps -p $word -o pid,user,stat,comm,args -w -w 2>/dev/null'
-zstyle ':fzf-tab:complete:(ssh|scp|sftp):*' fzf-preview 'ssh -G ${word##*@} 2>/dev/null | sed -n "1,90p"'
-zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'systemctl status $word --no-pager --full 2>/dev/null'
-zstyle ':fzf-tab:complete:git-(add|diff|restore|checkout|switch):*' fzf-preview 'git diff --color=always -- $word 2>/dev/null || git log --oneline --decorate --color=always -20 -- $word 2>/dev/null'
-zstyle ':fzf-tab:complete:(npm|pnpm):*' fzf-preview 'if [[ -f package.json ]]; then jq -r ".scripts // {} | to_entries[] | \"\(.key)\t\(.value)\"" package.json 2>/dev/null || sed -n "1,120p" package.json; fi'
-zstyle ':fzf-tab:complete:(cargo|rustup):*' fzf-preview 'case "$group" in *command*) "$words[1]" "$word" --help 2>/dev/null | sed -n "1,120p" ;; *) print -r -- "$group: $word" ;; esac'
-zstyle ':fzf-tab:complete:uv:*' fzf-preview 'case "$group" in *command*) uv "$word" --help 2>/dev/null | sed -n "1,120p" ;; *) print -r -- "$group: $word" ;; esac'
-zstyle ':fzf-tab:complete:docker:*' fzf-preview 'docker inspect $word 2>/dev/null | sed -n "1,120p" || docker ps -a --filter "name=$word" --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}" 2>/dev/null'
 # =============================================================================
 # zsh-vi-mode hook — перепривязываем Tab ПОСЛЕ того как ZVM перезапишет биндинги
 # =============================================================================
@@ -620,7 +628,6 @@ bindkey -M vicmd '^[[B' history-substring-search-down
 
 bindkey -M viins '^P' history-substring-search-up
 bindkey -M viins '^N' history-substring-search-down
-
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 

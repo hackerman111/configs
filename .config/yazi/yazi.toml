@@ -4,7 +4,3 @@ show_hidden = true
 pdf-view = [
     { run = 'zathura %s', block = true, desc = 'View PDF with Zathura'}
 ]
-[open]
-append_rules = [
-    { name = '*.pdf', use = 'pdf-view' }
-]

@@ -5,7 +5,6 @@ local function transparent_nvim()
         "Normal",
         "NormalNC",
         "SignColumn",
-        "EndOfBuffer",
         "LineNr",
         "CursorLineNr",
         "FoldColumn",
@@ -21,6 +20,7 @@ local function transparent_nvim()
 end
 
 transparent_nvim()
+vim.opt.fillchars:append({ eob = " " })
 
 vim.api.nvim_create_autocmd("ColorScheme", {
     callback = transparent_nvim,

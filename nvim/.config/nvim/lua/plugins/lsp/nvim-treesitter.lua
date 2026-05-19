@@ -19,7 +19,7 @@ return {
         highlight = {
             enable = true,
             additional_vim_regex_highlighting = { "markdown" }, -- критично для ipynb + render-markdown
-            disable = {},                                 -- если latex будет конфликтовать — добавь "latex"
+            disable = {},                                       -- если latex будет конфликтовать — добавь "latex"
         },
 
         indent = { enable = true },

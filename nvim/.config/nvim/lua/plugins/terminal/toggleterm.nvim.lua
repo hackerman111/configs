@@ -61,7 +61,7 @@ return {
 					border = "curved", -- single/double/shadow/curved
 					width = math.floor(0.7 * vim.fn.winwidth(0)),
 					height = math.floor(0.8 * vim.fn.winheight(0)),
-					winblend = 4,
+					winblend = 0,
 				},
 				winbar = {
 					enabled = true,
@@ -69,7 +69,7 @@ return {
 			})
 		end,
 		keys = {
-			{ "<F12>", desc = "Открыть/закрыть терминал" },
+			{ "<F5>", desc = "Открыть/закрыть терминал" },
 			{ "<Leader>at", "<cmd>ToggleTerm direction=float<CR>", desc = "Плавающий терминал" },
 		},
 	},
