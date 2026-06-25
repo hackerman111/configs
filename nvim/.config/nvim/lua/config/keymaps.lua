@@ -42,3 +42,21 @@ map(
     ": silent exec '!inkscape-figures edit \"'.b:vimtex.root.'/figures/\" > /dev/null 2>&1 &'<CR><CR>:redraw!<CR>",
     { desc = "Открыть фигуры Inkscape" }
 )
+vim.api.nvim_create_user_command("Zathura", function(opts)
+    local file = vim.fn.expand(opts.args)
+
+    if file == "" then
+        print("Укажи файл: :Zathura path/to/file.pdf")
+        return
+    end
+
+    if vim.fn.filereadable(file) == 0 then
+        print("Файл не найден: " .. file)
+        return
+    end
+
+    vim.fn.jobstart({ "zathura", file }, { detach = true })
+end, {
+    nargs = 1,
+    complete = "file",
+})

@@ -699,37 +699,37 @@ snippets.environments = {
 -- 8. Греческие буквы  (только в мат. окружении)
 ---------------------------------------------------
 snippets.greek_letters = {
-    ms({ trig = ";a", name = "alpha" }, t("\\alpha")),
-    ms({ trig = ";b", name = "beta" }, t("\\beta")),
-    ms({ trig = ";g", name = "gamma" }, t("\\gamma")),
-    ms({ trig = ";G", name = "Gamma" }, t("\\Gamma")),
-    ms({ trig = ";d", name = "delta" }, t("\\delta")),
-    ms({ trig = ";D", name = "Delta" }, t("\\Delta")),
-    ms({ trig = ";ep", name = "varepsilon" }, t("\\varepsilon")),
-    ms({ trig = ";z", name = "zeta" }, t("\\zeta")),
-    ms({ trig = ";et", name = "eta" }, t("\\eta")),
-    ms({ trig = ";th", name = "theta" }, t("\\theta")),
-    ms({ trig = ";Th", name = "Theta" }, t("\\Theta")),
-    ms({ trig = ";i", name = "iota" }, t("\\iota")),
-    ms({ trig = ";k", name = "kappa" }, t("\\kappa")),
-    ms({ trig = ";l", name = "lambda" }, t("\\lambda")),
-    ms({ trig = ";L", name = "Lambda" }, t("\\Lambda")),
-    ms({ trig = ";m", name = "mu" }, t("\\mu")),
-    ms({ trig = ";n", name = "nu" }, t("\\nu")),
-    ms({ trig = ";x", name = "xi" }, t("\\xi")),
-    ms({ trig = ";X", name = "Xi" }, t("\\Xi")),
-    ms({ trig = ";s", name = "sigma" }, t("\\sigma")),
-    ms({ trig = ";S", name = "Sigma" }, t("\\Sigma")),
-    ms({ trig = ";t", name = "tau" }, t("\\tau")),
-    ms({ trig = ";u", name = "upsilon" }, t("\\upsilon")),
-    ms({ trig = ";o", name = "omega" }, t("\\omega")),
-    ms({ trig = ";O", name = "Omega" }, t("\\Omega")),
-    ms({ trig = ";r", name = "rho" }, t("\\rho")),
-    ms({ trig = ";p", name = "varphi" }, t("\\varphi")),
-    ms({ trig = ";P", name = "Phi" }, t("\\Phi")),
-    ms({ trig = ";c", name = "chi" }, t("\\chi")),
-    ms({ trig = ";ps", name = "psi" }, t("\\psi")),
-    ms({ trig = ";Ps", name = "Psi" }, t("\\Psi")),
+    ms({ trig = "@a", name = "alpha" }, t("\\alpha")),
+    ms({ trig = "@b", name = "beta" }, t("\\beta")),
+    ms({ trig = "@g", name = "gamma" }, t("\\gamma")),
+    ms({ trig = "@G", name = "Gamma" }, t("\\Gamma")),
+    ms({ trig = "@d", name = "delta" }, t("\\delta")),
+    ms({ trig = "@D", name = "Delta" }, t("\\Delta")),
+    ms({ trig = "@ep", name = "varepsilon" }, t("\\varepsilon")),
+    ms({ trig = "@z", name = "zeta" }, t("\\zeta")),
+    ms({ trig = "@et", name = "eta" }, t("\\eta")),
+    ms({ trig = "@th", name = "theta" }, t("\\theta")),
+    ms({ trig = "@Th", name = "Theta" }, t("\\Theta")),
+    ms({ trig = "@i", name = "iota" }, t("\\iota")),
+    ms({ trig = "@k", name = "kappa" }, t("\\kappa")),
+    ms({ trig = "@l", name = "lambda" }, t("\\lambda")),
+    ms({ trig = "@L", name = "Lambda" }, t("\\Lambda")),
+    ms({ trig = "@m", name = "mu" }, t("\\mu")),
+    ms({ trig = "@n", name = "nu" }, t("\\nu")),
+    ms({ trig = "@x", name = "xi" }, t("\\xi")),
+    ms({ trig = "@X", name = "Xi" }, t("\\Xi")),
+    ms({ trig = "@s", name = "sigma" }, t("\\sigma")),
+    ms({ trig = "@S", name = "Sigma" }, t("\\Sigma")),
+    ms({ trig = "@ta", name = "tau" }, t("\\tau")),
+    ms({ trig = "@u", name = "upsilon" }, t("\\upsilon")),
+    ms({ trig = "@o", name = "omega" }, t("\\omega")),
+    ms({ trig = "@O", name = "Omega" }, t("\\Omega")),
+    ms({ trig = "@r", name = "rho" }, t("\\rho")),
+    ms({ trig = "@p", name = "varphi" }, t("\\varphi")),
+    ms({ trig = "@P", name = "Phi" }, t("\\Phi")),
+    ms({ trig = "@c", name = "chi" }, t("\\chi")),
+    ms({ trig = "@ps", name = "psi" }, t("\\psi")),
+    ms({ trig = "@Ps", name = "Psi" }, t("\\Psi")),
 
     -- Триггеры с дополнительной защитой от \keyword
     ms({ trig = "pi", name = "uppi" }, t("\\uppi"),
@@ -841,8 +841,18 @@ end)()
 snippets.misc = {
     -- Автоиндексы: x2 → x_{2}, x_23 → x_{23}
     ms({ trig = "([%a])(%d)", name = "Auto Subscript", regTrig = true },
-        f(function(_, snip) return string.format("%s_{%s}", snip.captures[1], snip.captures[2]) end, {})),
+        f(function(_, snip) return string.format("%s_%s", snip.captures[1], snip.captures[2]) end, {})),
+
+    -- 2. Для греческих букв и команд LaTeX (например, \theta1 -> \theta_{1})
+    ms({ trig = "(\\%a+)(%d)", name = "Auto Subscript (LaTeX)", regTrig = true },
+        f(function(_, snip) return string.format("%s_%s", snip.captures[1], snip.captures[2]) end, {})),
+
+    -- 3. Для одиночных символов с двумя цифрами (например, a_12 -> a_{12})
     ms({ trig = "([%a])_(%d%d)", name = "Auto Subscript 2", regTrig = true },
+        f(function(_, snip) return string.format("%s_{%s}", snip.captures[1], snip.captures[2]) end, {})),
+
+    -- 4. Для LaTeX-команд с двумя цифрами (например, \theta_12 -> \theta_{12})
+    ms({ trig = "(\\%a+)_(%d%d)", name = "Auto Subscript 2 (LaTeX)", regTrig = true },
         f(function(_, snip) return string.format("%s_{%s}", snip.captures[1], snip.captures[2]) end, {})),
 
     -- Инлайн-декораторы

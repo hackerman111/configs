@@ -69,9 +69,9 @@ return {
                 default = {
                     "lsp",
                     "path",
-                    "buffer",
-                    "emoji",
-                    --			"dictionary",
+                    --"buffer",
+                    --"emoji",
+                    --"dictionary",
                     --"copilot",
                     --"snippets",
                     --"ripgrep",
@@ -137,24 +137,24 @@ return {
                             show_hidden_files_by_default = true,
                         },
                     },
-                    buffer = {
-                        name = "Buffer",
-                        enabled = true,
-                        max_items = 3,
-                        module = "blink.cmp.sources.buffer",
-                        min_keyword_length = 2,
-                        score_offset = 15, -- the higher the number, the higher the priority
-                    },
+                    -- buffer = {
+                    --     name = "Buffer",
+                    --     enabled = true,
+                    --     max_items = 3,
+                    --     module = "blink.cmp.sources.buffer",
+                    --     min_keyword_length = 2,
+                    --     score_offset = 15, -- the higher the number, the higher the priority
+                    -- },
                     -- Example on how to configure dadbod found in the main repo
                     -- https://github.com/kristijanhusak/vim-dadbod-completion
                     -- https://github.com/moyiz/blink-emoji.nvim
-                    emoji = {
-                        module = "blink-emoji",
-                        name = "Emoji",
-                        score_offset = 89,        -- the higher the number, the higher the priority
-                        min_keyword_length = 2,
-                        opts = { insert = true }, -- Insert emoji (default) or complete its name
-                    },
+                    -- emoji = {
+                    --     module = "blink-emoji",
+                    --     name = "Emoji",
+                    --     score_offset = 89,        -- the higher the number, the higher the priority
+                    --     min_keyword_length = 2,
+                    --     opts = { insert = true }, -- Insert emoji (default) or complete its name
+                    -- },
                     -- https://github.com/Kaiser-Yang/blink-cmp-dictionary
                     -- In macOS to get started with a dictionary:
                     -- cp /usr/share/dict/words ~/github/dotfiles-latest/dictionaries/words.txt
@@ -261,7 +261,7 @@ return {
                     },
                 },
                 documentation = {
-                    auto_show = true,
+                    auto_show = false,
                     window = {
                         border = "single",
                     },

@@ -22,7 +22,6 @@ return {
                     "-file-line-error",
                     "-synctex=1",
                     "-interaction=nonstopmode",
-
                     -- Разрешает LaTeX выполнять внешние команды. Необходимо для пакетов
                     -- вроде 'minted' (подсветка кода) или сложных импортов.
                     "-shell-escape",
@@ -34,8 +33,8 @@ return {
             vim.g.vimtex_delim_toggle_mod_list = { { "\\left", "\\right" }, { "\\big", "\\big" } }
 
             -- Горячая клавиша для компиляции
-	            vim.keymap.set("n", "<leader>LL", "<cmd>VimtexCompile<CR>", { desc = "Собрать LaTeX-документ" })
-	        end,
-	    },
+            vim.keymap.set("n", "<leader>LL", "<cmd>VimtexCompile<CR>", { desc = "Собрать LaTeX-документ" })
+        end,
+    },
     -- For `plugins/markview.lua` users.
 }

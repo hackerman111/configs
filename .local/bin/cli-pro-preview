@@ -1,0 +1,46 @@
+#!/usr/bin/env zsh
+
+main() {
+  emulate -L zsh
+  setopt no_aliases
+
+  source "$HOME/.config/zsh/cli-pro-preview.zsh" || return 0
+
+  local mode="$1"
+  [[ -n "$mode" ]] || return 0
+  shift
+
+  case "$mode" in
+    command)
+      _cli_pro_preview_command "$1"
+      ;;
+
+    help)
+      _cli_pro_preview_help "$@"
+      ;;
+
+    flag)
+      local cmd="$1"
+      local flag="$2"
+      shift 2
+
+      words=("$cmd" "$@")
+      _cli_pro_preview_flag "$cmd" "$flag" "$@"
+      ;;
+
+    generic)
+      local target="$1"
+      local word="$2"
+      local group="$3"
+      local desc="$4"
+      shift 4
+
+      words=("$@")
+      _cli_pro_preview_file_or_doc "$target" "$word" "$group" "$desc"
+      ;;
+  esac
+
+  return 0
+}
+
+main "$@"
