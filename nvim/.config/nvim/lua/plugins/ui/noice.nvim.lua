@@ -39,9 +39,10 @@ return {
 			},
 			lsp = {
 				message = {
-					-- Messages shown by lsp servers
-					enabled = true,
-					view = "notify",
+					enabled = false,
+				},
+				progress = {
+					enabled = false,
 				},
 			},
 			views = {
