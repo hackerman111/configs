@@ -6,8 +6,7 @@
 # Автор: Создано на основе анализа конфигурационных файлов
 # ============================================================================
 
-set -e  # Остановка при ошибке
-
+set -e # Остановка при ошибке
 
 # Цвета для вывода
 RED='\033[0;31m'
@@ -112,7 +111,7 @@ run_optional_step() {
 }
 
 # Проверка прав суперпользователя
-if [ "$EUID" -eq 0 ]; then 
+if [ "$EUID" -eq 0 ]; then
     print_error "Не запускайте этот скрипт от имени root!"
     print_info "Скрипт сам запросит пароль sudo когда потребуется."
     exit 1
@@ -134,19 +133,19 @@ print_success "Система обновлена"
 print_section "2. Установка базовых инструментов"
 
 BASIC_TOOLS=(
-    base-devel          # Инструменты для сборки
-    git                 # Система контроля версий
-    curl                # Утилита для загрузки
-    wget                # Альтернатива curl
-    ca-certificates     # TLS для curl/git на чистой системе
-    gnupg               # Проверка подписей
-    rsync               # Синхронизация файлов
-    sudo                # Эскалация прав
-    unzip               # Распаковка архивов
-    xdg-utils          # Утилиты XDG
-    polkit             # Аутентификация
-    man-db             # Справочные страницы
-    man-pages          # Дополнительные man-страницы
+    base-devel      # Инструменты для сборки
+    git             # Система контроля версий
+    curl            # Утилита для загрузки
+    wget            # Альтернатива curl
+    ca-certificates # TLS для curl/git на чистой системе
+    gnupg           # Проверка подписей
+    rsync           # Синхронизация файлов
+    sudo            # Эскалация прав
+    unzip           # Распаковка архивов
+    xdg-utils       # Утилиты XDG
+    polkit          # Аутентификация
+    man-db          # Справочные страницы
+    man-pages       # Дополнительные man-страницы
 )
 
 print_info "Установка: ${BASIC_TOOLS[*]}"
@@ -160,14 +159,14 @@ print_success "Базовые инструменты установлены"
 print_section "3. Установка Hyprland и компонентов Wayland"
 
 HYPRLAND_PACKAGES=(
-    hypridle           # Idle-lock daemon Hyprland
-    hyprland           # Оконный менеджер
-    hyprlock           # Блокировка экрана Hyprland
-    hyprpaper          # Обои для Hyprland
-    hyprpicker         # Color picker под Wayland
-    hyprshot           # Скриншоты под Hyprland
-    niri               # Дополнительный Wayland compositor из текущей системы
-    xdg-desktop-portal-hyprland  # Desktop portal
+    hypridle                    # Idle-lock daemon Hyprland
+    hyprland                    # Оконный менеджер
+    hyprlock                    # Блокировка экрана Hyprland
+    hyprpaper                   # Обои для Hyprland
+    hyprpicker                  # Color picker под Wayland
+    hyprshot                    # Скриншоты под Hyprland
+    niri                        # Дополнительный Wayland compositor из текущей системы
+    xdg-desktop-portal-hyprland # Desktop portal
 )
 
 print_info "Установка: ${HYPRLAND_PACKAGES[*]}"
@@ -181,29 +180,29 @@ print_success "Hyprland установлен"
 print_section "4. Установка Waybar и системных утилит"
 
 WAYBAR_PACKAGES=(
-    waybar             # Статус-бар
-    wofi               # Меню приложений
-    rofi               # Альтернативное меню
-    dunst              # Уведомления (опционально)
-    brightnessctl      # Управление яркостью
-    playerctl          # Управление медиаплеером
-    pamixer            # Управление звуком (альтернатива)
-    pavucontrol        # GUI для звука
-    networkmanager     # Управление сетью
-    network-manager-applet  # Апплет NetworkManager
-    bluez              # Bluetooth стек
-    bluez-utils        # Утилиты Bluetooth
-    blueman            # GUI/TUI-совместимое управление Bluetooth
-    bluetui            # Bluetooth TUI
-    lm_sensors         # Датчики температуры
-    nvidia-utils       # NVIDIA sensors/nvidia-smi для waybar gpu scripts
-    nvtop              # Мониторинг GPU
-    pipewire-pulse     # PulseAudio compatibility поверх PipeWire
-    piper              # Настройка игровых мышей/logiops окружения
-    upower             # Управление питанием
-    pacman-contrib     # checkupdates
-    cups               # Печать
-    reflector          # Обновление mirrorlist
+    waybar                 # Статус-бар
+    wofi                   # Меню приложений
+    rofi                   # Альтернативное меню
+    dunst                  # Уведомления (опционально)
+    brightnessctl          # Управление яркостью
+    playerctl              # Управление медиаплеером
+    pamixer                # Управление звуком (альтернатива)
+    pavucontrol            # GUI для звука
+    networkmanager         # Управление сетью
+    network-manager-applet # Апплет NetworkManager
+    bluez                  # Bluetooth стек
+    bluez-utils            # Утилиты Bluetooth
+    blueman                # GUI/TUI-совместимое управление Bluetooth
+    bluetui                # Bluetooth TUI
+    lm_sensors             # Датчики температуры
+    nvidia-utils           # NVIDIA sensors/nvidia-smi для waybar gpu scripts
+    nvtop                  # Мониторинг GPU
+    pipewire-pulse         # PulseAudio compatibility поверх PipeWire
+    piper                  # Настройка игровых мышей/logiops окружения
+    upower                 # Управление питанием
+    pacman-contrib         # checkupdates
+    cups                   # Печать
+    reflector              # Обновление mirrorlist
 )
 
 print_info "Установка: ${WAYBAR_PACKAGES[*]}"
@@ -222,12 +221,12 @@ sudo systemctl start bluetooth.service
 print_section "6. Установка терминалов и оболочки"
 
 TERMINAL_PACKAGES=(
-    kitty              # Основной терминал
+    kitty # Основной терминал
     ghostty
-    alacritty          # Альтернативный терминал
-    tmux               # Мультиплексор терминала
-    zsh                # Z Shell
-    zsh-completions    # Дополнения для Zsh
+    alacritty       # Альтернативный терминал
+    tmux            # Мультиплексор терминала
+    zsh             # Z Shell
+    zsh-completions # Дополнения для Zsh
 )
 
 print_info "Установка: ${TERMINAL_PACKAGES[*]}"
@@ -250,9 +249,9 @@ fi
 print_section "7. Установка Nerd Fonts"
 
 FONT_PACKAGES=(
-    ttf-jetbrains-mono-nerd  # JetBrains Mono Nerd Font
-    ttf-meslo-nerd           # Meslo Nerd Font
-    ttf-firacode-nerd        # Fira Code Nerd Font (опционально)
+    ttf-jetbrains-mono-nerd # JetBrains Mono Nerd Font
+    ttf-meslo-nerd          # Meslo Nerd Font
+    ttf-firacode-nerd       # Fira Code Nerd Font (опционально)
     noto-fonts              # Поддержка Unicode
     noto-fonts-emoji        # Emoji
     ttf-liberation          # Liberation fonts
@@ -270,35 +269,35 @@ print_success "Шрифты установлены"
 print_section "8. Установка утилит командной строки"
 
 CLI_TOOLS=(
-    fzf                # Fuzzy finder
-    ripgrep            # Быстрый grep
-    fd                 # Быстрый find
-    bat                # Cat с подсветкой
-    eza                # Современный ls
-    zoxide             # Умный cd
-    starship           # Промпт
-    lazygit            # TUI для Git
-    gitui              # Альтернативный TUI для Git
-    thefuck            # Исправление команд
-    tree               # Дерево каталогов
-    htop               # Монитор процессов
-    glances            # Расширенный монитор процессов
-    ncdu               # Анализатор дисков
-    dust               # Современный анализатор дисков
-    gdu                # Быстрый анализатор дисков
-    tldr               # Упрощенные man-страницы
-    yazi 
-    ffmpeg 
-    7zip 
-    jq 
-    poppler 
-    fd 
-    ripgrep 
-    fzf 
-    zoxide 
-    resvg 
+    fzf      # Fuzzy finder
+    ripgrep  # Быстрый grep
+    fd       # Быстрый find
+    bat      # Cat с подсветкой
+    eza      # Современный ls
+    zoxide   # Умный cd
+    starship # Промпт
+    lazygit  # TUI для Git
+    gitui    # Альтернативный TUI для Git
+    thefuck  # Исправление команд
+    tree     # Дерево каталогов
+    htop     # Монитор процессов
+    glances  # Расширенный монитор процессов
+    ncdu     # Анализатор дисков
+    dust     # Современный анализатор дисков
+    gdu      # Быстрый анализатор дисков
+    tldr     # Упрощенные man-страницы
+    yazi
+    ffmpeg
+    7zip
+    jq
+    poppler
+    fd
+    ripgrep
+    fzf
+    zoxide
+    resvg
     stow
-    just 
+    just
     git-delta
     yq
     bats
@@ -367,18 +366,18 @@ print_info "Установка Python пакетов..."
 print_section "10. Установка LaTeX"
 
 LATEX_PACKAGES=(
-    texlive-basic      # Базовый TeX Live
-    texlive-latex      # LaTeX
-    texlive-latexextra # Дополнительные пакеты
-    texlive-fontsextra # Дополнительные шрифты
+    texlive-basic       # Базовый TeX Live
+    texlive-latex       # LaTeX
+    texlive-latexextra  # Дополнительные пакеты
+    texlive-fontsextra  # Дополнительные шрифты
     texlive-mathscience # Математика
-    texlive-luatex     # LuaTeX
-    texlive-xetex      # XeTeX
+    texlive-luatex      # LuaTeX
+    texlive-xetex       # XeTeX
     texlive-binextra
-    biber              # Библиографии
-    zathura            # PDF viewer
-    zathura-pdf-mupdf  # PDF плагин для Zathura
-    zathura-djvu  # PDF плагин для Zathura
+    biber             # Библиографии
+    zathura           # PDF viewer
+    zathura-pdf-mupdf # PDF плагин для Zathura
+    zathura-djvu      # PDF плагин для Zathura
     zathura-pdf-poppler
     zathura-ps
     zathura-cb
@@ -399,12 +398,12 @@ print_success "LaTeX установлен"
 print_section "11. Установка дополнительных приложений"
 
 EXTRA_APPS=(
-    firefox            # Браузер
-    dolphin            # Файловый менеджер
-    ark                # Архиватор
-    gwenview           # Просмотр изображений
-    mpv                # Видеоплеер
-    imv                # Просмотр изображений (легковесный)
+    firefox  # Браузер
+    dolphin  # Файловый менеджер
+    ark      # Архиватор
+    gwenview # Просмотр изображений
+    mpv      # Видеоплеер
+    imv      # Просмотр изображений (легковесный)
 )
 
 print_info "Установка: ${EXTRA_APPS[*]}"
@@ -998,7 +997,7 @@ print_success "Все пакеты из pkglist-repo.txt установлены"
 
 print_section "12. Установка AUR Helper (yay)"
 
-if ! command -v yay &> /dev/null; then
+if ! command -v yay &>/dev/null; then
     print_info "Установка yay..."
     git clone https://aur.archlinux.org/yay.git /tmp/yay
     cd /tmp/yay
@@ -1017,11 +1016,11 @@ fi
 print_section "13. Установка пакетов из AUR"
 
 AUR_PACKAGES=(
-    hyprshot           # Скриншоты для Hyprland
-    warpd              # Управление курсором с клавиатуры
-    bluetui            # Bluetooth TUI
+    hyprshot # Скриншоты для Hyprland
+    warpd    # Управление курсором с клавиатуры
+    bluetui  # Bluetooth TUI
     obsidian
-    xkb-switch         # Переключатель раскладки (полезно для Neovim)
+    xkb-switch # Переключатель раскладки (полезно для Neovim)
     neofetch
     adguardvpn-cli-bin
     aimp
@@ -1046,12 +1045,13 @@ AUR_PACKAGES=(
     zotero-git
     ventoy-bin
     librewolf-bin
+    aimp
 )
 
 print_info "Установка из AUR: ${AUR_PACKAGES[*]}"
 FAILED_AUR_PACKAGES=()
 for package in "${AUR_PACKAGES[@]}"; do
-    if yay -Q "$package" &> /dev/null; then
+    if yay -Q "$package" &>/dev/null; then
         print_info "$package уже установлен"
     else
         print_info "Установка $package..."
@@ -1118,7 +1118,6 @@ else
     print_info "tmuxifier уже установлен"
 fi
 
-
 # ============================================================================
 # 15. НАСТРОЙКА LSP И ФОРМАТТЕРОВ ДЛЯ NEOVIM
 # ============================================================================
@@ -1129,10 +1128,10 @@ print_section "15. Установка LSP серверов и форматтер
 # Но мы можем установить некоторые системно для надежности
 
 LSP_FORMATTERS=(
-    lua-language-server  # Lua LSP
-    stylua               # Lua formatter
-    clang                # Предоставляет clangd и clang-format
-    prettier             # Форматтер для многих языков
+    lua-language-server # Lua LSP
+    stylua              # Lua formatter
+    clang               # Предоставляет clangd и clang-format
+    prettier            # Форматтер для многих языков
 )
 
 print_info "Установка: ${LSP_FORMATTERS[*]}"
@@ -1170,7 +1169,6 @@ if [ -d "$DOTFILES_DIR" ]; then
     deploy_dotfiles_configs
 fi
 
-
 # ============================================================================
 # 16. ФИНАЛЬНЫЕ НАСТРОЙКИ
 # ============================================================================
@@ -1179,7 +1177,7 @@ print_section "17. Финальные настройки"
 
 # Обновление базы данных шрифтов
 print_info "Обновление кэша шрифтов..."
-fc-cache -fv > /dev/null 2>&1
+fc-cache -fv >/dev/null 2>&1
 print_success "Кэш шрифтов обновлен"
 
 # Включение необходимых служб

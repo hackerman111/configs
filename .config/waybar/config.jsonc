@@ -6,6 +6,7 @@
   "mode": "dock",
   "reload_style_on_change": true,
   "gtk-layer-shell": true,
+  "fixed-center": true,
 
   // ──────────────────────────────────────────────────────────┤ positions ├───
 
@@ -17,7 +18,8 @@
     "custom/right1",
 
     "custom/paddw",
-    "hyprland/window"       // window title
+    "hyprland/window"      // window title
+
   ],
 
   "modules-center": [
@@ -26,29 +28,29 @@
 
     "custom/left4",
     "cpu",                  // cpu
+
     "custom/left9",
     "custom/gpu-temp",      // gpu temperature
+
     "custom/left10",
-    "custom/gpu-vram",      // gpu vram usage
+    "custom/gpu-vram",       // gpu vram usage
     "custom/leftin1",
-
-
     "custom/rightin1",
     "idle_inhibitor",       // idle inhibitor
-    "clock#time",           // time
-    "custom/right3",
 
     "clock#date",           // date
+    "custom/right3",
+    "clock#time",           // time
     "custom/right4",
-
     "custom/wifi",          // wi-fi
     "bluetooth",            // bluetooth
-    "custom/update",        // system update
-    "custom/right5"
+    "custom/update"        // system update
   ],
 
   "modules-right": [
+    "custom/right5",
     "mpris",                // media info
+    "custom/aimp",          // AIMP controls
 
     "custom/left6",
     "pulseaudio",           // output device
@@ -94,7 +96,8 @@
     "swap-icon-label": false,
     "format": "{}",
     "tooltip": false,
-    "min-length": 15,
+    "min-length": 18,
+    "max-length": 18,
 
     "rewrite": {
       // ────────────────────────────────────────────────────────── desktop ───
@@ -383,8 +386,29 @@
 
     "tooltip-format": "Playing: {title} - {artist}",
     "tooltip-format-paused": "Paused: {title} - {artist}",
-    "min-length": 5,
-    "max-length": 35
+    "min-length": 18,
+    "max-length": 18
+  },
+
+  // ────────────────────────────────────────────────────────┤ AIMP controls ├───
+
+  "custom/aimp": {
+    "exec": "$HOME/.config/waybar/scripts/aimp-waybar.sh status",
+    "return-type": "json",
+    "format": "{text}",
+    "interval": 2,
+    "signal": 9,
+    "exec-on-event": true,
+    "escape": true,
+    "min-length": 18,
+    "max-length": 18,
+    "tooltip": true,
+
+    "on-click": "$HOME/.config/waybar/scripts/aimp-waybar.sh toggle",
+    "on-click-right": "$HOME/.config/waybar/scripts/aimp-waybar.sh next",
+    "on-scroll-up": "$HOME/.config/waybar/scripts/aimp-waybar.sh previous",
+    "on-scroll-down": "$HOME/.config/waybar/scripts/aimp-waybar.sh next",
+    "smooth-scrolling-threshold": 1
   },
 
   // ──────────────────────────────────────────────────────┤ output device ├───
