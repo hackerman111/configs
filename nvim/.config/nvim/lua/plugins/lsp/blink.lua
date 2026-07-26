@@ -113,9 +113,6 @@ return {
 						name = "lsp",
 						enabled = true,
 						module = "blink.cmp.sources.lsp",
-						-- Не блокировать меню, пока Pyright анализирует проект.
-						async = true,
-						timeout_ms = 100,
 						min_keyword_length = 0,
 						-- When linking markdown notes, I would get snippets and text in the
 						-- suggestions, I want those to show only if there are no LSP
@@ -269,13 +266,9 @@ return {
 					},
 				},
 				documentation = {
-					auto_show = true,
-					auto_show_delay_ms = 700,
-					treesitter_highlighting = false,
+					auto_show = false,
 					window = {
 						border = "single",
-						max_height = 10,
-						desired_min_height = 4,
 					},
 				},
 				list = {

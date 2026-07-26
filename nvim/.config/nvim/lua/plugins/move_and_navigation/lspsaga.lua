@@ -116,13 +116,45 @@ return {
 				},
 			},
 		})
+		-- Автоматически показывать LSP-документацию под курсором.
+		vim.opt.updatetime = 700
 
-			-- Настройка горячих клавиш
-			local map = vim.keymap.set
-			local opts = { silent = true, noremap = true }
+		local hover_group = vim.api.nvim_create_augroup("LspsagaAutoHover", { clear = true })
 
-			map(
-				"n",
+		vim.api.nvim_create_autocmd("CursorHold", {
+			group = hover_group,
+
+			callback = function(event)
+				-- Не открывать hover в Telescope, Trouble, терминале и прочих
+				-- служебных буферах.
+				if vim.bo[event.buf].buftype ~= "" then
+					return
+				end
+
+				-- Проверить, что подключён хотя бы один LSP с hover.
+				local has_hover = false
+
+				for _, client in ipairs(vim.lsp.get_clients({ bufnr = event.buf })) do
+					if client:supports_method("textDocument/hover") then
+						has_hover = true
+						break
+					end
+				end
+
+				if not has_hover then
+					return
+				end
+
+				vim.cmd("silent! Lspsaga hover_doc")
+			end,
+		})
+
+		-- Настройка горячих клавиш
+		local map = vim.keymap.set
+		local opts = { silent = true, noremap = true }
+
+		map(
+			"n",
 			"K",
 			"<cmd>Lspsaga hover_doc<CR>",
 			vim.tbl_extend("force", opts, { desc = "Показать документацию (Hover)" })
@@ -140,30 +172,40 @@ return {
 			vim.tbl_extend("force", opts, { desc = "Перейти к определению типа" })
 		)
 
-			map(
-				"n",
-				"[d",
-				"<cmd>Lspsaga diagnostic_jump_prev<CR>",
-				vim.tbl_extend("force", opts, { desc = "К предыдущей диагностике" })
-			)
-			map(
-				"n",
-				"]d",
-				"<cmd>Lspsaga diagnostic_jump_next<CR>",
-				vim.tbl_extend("force", opts, { desc = "К следующей диагностике" })
-			)
-			map("n", "<leader>gD", "<cmd>Lspsaga show_line_diagnostics<CR>", vim.tbl_extend("force", opts, {
+		map(
+			"n",
+			"[d",
+			"<cmd>Lspsaga diagnostic_jump_prev<CR>",
+			vim.tbl_extend("force", opts, { desc = "К предыдущей диагностике" })
+		)
+		map(
+			"n",
+			"]d",
+			"<cmd>Lspsaga diagnostic_jump_next<CR>",
+			vim.tbl_extend("force", opts, { desc = "К следующей диагностике" })
+		)
+		map(
+			"n",
+			"<leader>gD",
+			"<cmd>Lspsaga show_line_diagnostics<CR>",
+			vim.tbl_extend("force", opts, {
 				desc = "Показать диагностику строки",
-			}))
+			})
+		)
 
-			map(
-				{ "n", "v" },
-				"<leader>ca",
-				"<cmd>Lspsaga code_action<CR>",
-				vim.tbl_extend("force", opts, { desc = "Действия с кодом (Code Action)" })
-			)
-			map("n", "<leader>lo", "<cmd>Lspsaga outline<CR>", vim.tbl_extend("force", opts, {
+		map(
+			{ "n", "v" },
+			"<leader>ca",
+			"<cmd>Lspsaga code_action<CR>",
+			vim.tbl_extend("force", opts, { desc = "Действия с кодом (Code Action)" })
+		)
+		map(
+			"n",
+			"<leader>lo",
+			"<cmd>Lspsaga outline<CR>",
+			vim.tbl_extend("force", opts, {
 				desc = "Lspsaga: структура файла",
-			}))
+			})
+		)
 	end,
 }
