@@ -1,0 +1,79 @@
+-- Archived COQ completion configuration.
+-- This file is documentation only and is not imported by lazy.nvim.
+--
+-- LSP dependencies:
+--
+-- { "ms-jpq/coq_nvim", branch = "coq" },
+-- {
+-- 	"ms-jpq/coq.thirdparty",
+-- 	config = function()
+-- 		require("coq_3p")({})
+-- 	end,
+-- },
+--
+-- LSP plugin init:
+--
+-- init = function()
+-- 	vim.g.coq_settings = {
+-- 		completion = {
+-- 			skip_after = { " " },
+-- 			sticky_manual = false,
+-- 			always = true,
+-- 		},
+-- 		auto_start = "shut-up",
+-- 		clients = {
+-- 			lsp = {
+-- 				enabled = true,
+-- 			},
+-- 			tree_sitter = {
+-- 				enabled = true,
+-- 				weight_adjust = 1.0,
+-- 			},
+-- 			-- copilot = { enabled = true },
+-- 		},
+-- 		keymap = {
+-- 			recommended = false,
+-- 		},
+-- 		display = {
+-- 			ghost_text = {
+-- 				--- Characters surrounding ghost text for the current item.
+-- 				context = { " ", "" },
+-- 			},
+-- 			preview = {
+-- 				border = "solid",
+-- 				resolve_timeout = 0.01,
+-- 				-- positions = "east",
+-- 			},
+-- 			pum = {
+-- 				fast_close = true,
+-- 				y_ratio = 0.1,
+-- 				y_max_len = 5,
+-- 			},
+-- 		},
+-- 	}
+--
+-- 	vim.api.nvim_set_keymap(
+-- 		"i",
+-- 		"<Esc>",
+-- 		[[pumvisible() ? "\<C-e><Esc>" : "\<Esc>"]],
+-- 		{ expr = true, silent = true }
+-- 	)
+-- 	vim.api.nvim_set_keymap(
+-- 		"i",
+-- 		"<C-c>",
+-- 		[[pumvisible() ? "\<C-e><C-c>" : "\<C-c>"]],
+-- 		{ expr = true, silent = true }
+-- 	)
+-- 	vim.api.nvim_set_keymap(
+-- 		"i",
+-- 		"<BS>",
+-- 		[[pumvisible() ? "\<C-e><BS>" : "\<BS>"]],
+-- 		{ expr = true, silent = true }
+-- 	)
+-- 	vim.api.nvim_set_keymap(
+-- 		"i",
+-- 		"<CR>",
+-- 		[[pumvisible() ? (complete_info().selected == -1 ? "\<C-e><CR>" : "\<C-y>") : "\<CR>"]],
+-- 		{ expr = true, silent = true }
+-- 	)
+-- end,

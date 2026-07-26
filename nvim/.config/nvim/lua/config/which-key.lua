@@ -183,9 +183,8 @@ local function register_main_groups(wk)
 		{ "<leader>fb", desc = "Найти открытый буфер" },
 		{ "<leader>fo", desc = "Найти недавний файл" },
 		{ "<leader>fe", desc = "Найти диагностику текущего файла" },
-		{ "<leader>fz", desc = "Перейти в каталог через Zoxide" },
 		{ "<leader>fr", desc = "Найти проект" },
-		{ "<leader>fh", desc = "Открыть список Harpoon через Telescope" },
+		{ "<leader>hh", desc = "Открыть список Harpoon через Telescope" },
 
 		{ "<leader>gf", desc = "Форматировать код" },
 		{ "<leader>gl", desc = "Запустить проверку линтером" },

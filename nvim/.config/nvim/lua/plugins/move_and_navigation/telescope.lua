@@ -23,6 +23,25 @@ return {
 			local builtin = require("telescope.builtin")
 			local egrep_actions = require("telescope._extensions.egrepify.actions")
 
+			local function flash(prompt_bufnr)
+				require("flash").jump({
+					pattern = "^",
+					label = { after = { 0, 0 } },
+					search = {
+						mode = "search",
+						exclude = {
+							function(win)
+								return vim.bo[vim.api.nvim_win_get_buf(win)].filetype ~= "TelescopeResults"
+							end,
+						},
+					},
+					action = function(match)
+						local picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
+						picker:set_selection(match.pos[1] - 1)
+					end,
+				})
+			end
+
 			-- НАСТРОЙКА TELESCOPE
 			telescope.setup({
 				defaults = {
@@ -38,7 +57,9 @@ return {
 								})
 							end,
 						},
+						n = { s = flash },
 					},
+					initial_mode = "normal",
 				},
 				extensions = {
 					["ui-select"] = {
@@ -168,9 +189,11 @@ return {
 			vim.keymap.set("n", "<leader>fc", function()
 				builtin.find_files({ cwd = "~/" })
 			end, { desc = "Найти файлы в компьютере" })
+
 			vim.keymap.set("n", "<leader>fg", function()
 				telescope.extensions.egrepify.egrepify({})
 			end, { desc = "Найти по содержимому" })
+
 			vim.keymap.set(
 				"n",
 				"<leader>fb",
@@ -184,15 +207,11 @@ return {
 				{ desc = "Найти в недавних файлах" }
 			)
 
+			vim.keymap.set("n", "<leader>fm", builtin.marks, { desc = "показать марки" })
+
 			vim.keymap.set("n", "<leader>fe", function()
 				builtin.diagnostics({ bufnr = 0 })
 			end, { desc = "Найти ошибки в файле" })
-
-			-- Кеймапы для команд Telescope
-			-- ИСПРАВЛЕНО: Заменен <cmd> на прямой вызов функции для стабильности
-			vim.keymap.set("n", "<leader>fz", function()
-				require("telescope").extensions.zoxide.list()
-			end, { desc = "Поиск по Zoxide" })
 
 			vim.keymap.set(
 				"n",

@@ -29,28 +29,19 @@ opt.smartcase = true -- Учитывать регистр, если в запр�
 opt.scrolloff = 8 -- Оставлять 8 строк контекста при скроллинге
 opt.undofile = true -- Сохранять историю изменений между сессиями
 
--- Автоматический импорт/экспорт output-ов при работе с .ipynb
-vim.api.nvim_create_autocmd("BufAdd", {
-	pattern = "*.ipynb",
-	callback = function(e)
-		vim.schedule(function()
-			local ok, kernel = pcall(function()
-				local meta = vim.json.decode(io.open(e.file, "r"):read("*a")).metadata
-				return meta.kernelspec.name
-			end)
-			if ok and kernel then
-				vim.cmd("MoltenInit " .. kernel)
-			end
-			vim.cmd("MoltenImportOutput")
-		end)
-	end,
+-- Автодополнение и документацию показывает только Blink.
+-- Python ftplugin иначе включает отдельный встроенный popup.
+opt.completeopt = { "menuone", "noselect", "noinsert" }
+
+local completion_group = vim.api.nvim_create_augroup("user-blink-only-completion", {
+	clear = true,
 })
 
-vim.api.nvim_create_autocmd("BufWritePost", {
-	pattern = "*.ipynb",
-	callback = function()
-		if require("molten.status").initialized() == "Molten" then
-			vim.cmd("MoltenExportOutput!")
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = completion_group,
+	callback = function(event)
+		if vim.bo[event.buf].filetype == "python" then
+			vim.bo[event.buf].omnifunc = ""
 		end
 	end,
 })
