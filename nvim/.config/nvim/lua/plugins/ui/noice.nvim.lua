@@ -41,8 +41,25 @@ return {
 				message = {
 					enabled = false,
 				},
+
 				progress = {
 					enabled = false,
+				},
+
+				-- Hover рисует LSPsaga.
+				hover = {
+					enabled = false,
+				},
+
+				-- Signature либо рисует Blink, либо вообще никто.
+				signature = {
+					enabled = false,
+
+					auto_open = {
+						enabled = false,
+						trigger = false,
+						luasnip = false,
+					},
 				},
 			},
 			views = {

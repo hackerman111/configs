@@ -12,20 +12,20 @@
 
 local trigger_text = ";"
 return {
-	{
-		"zbirenbaum/copilot.lua",
-		cmd = "Copilot",
-		event = "InsertEnter",
-		opts = {
-			suggestion = { enabled = false },
-			panel = { enabled = false },
-			filetypes = {
-				markdown = false,
-				tex = false,
-				help = true,
-			},
-		},
-	},
+	-- {
+	-- 	"zbirenbaum/copilot.lua",
+	-- 	cmd = "Copilot",
+	-- 	event = "InsertEnter",
+	-- 	opts = {
+	-- 		suggestion = { enabled = false },
+	-- 		panel = { enabled = false },
+	-- 		filetypes = {
+	-- 			markdown = false,
+	-- 			tex = false,
+	-- 			help = true,
+	-- 		},
+	-- 	},
+	-- },
 	{
 		"saghen/blink.cmp",
 		version = "*",
@@ -113,7 +113,7 @@ return {
 						name = "lsp",
 						enabled = true,
 						module = "blink.cmp.sources.lsp",
-						min_keyword_length = 0,
+						min_keyword_length = 1,
 						-- When linking markdown notes, I would get snippets and text in the
 						-- suggestions, I want those to show only if there are no LSP
 						-- suggestions
@@ -300,6 +300,7 @@ return {
 			opts.keymap = {
 				preset = "enter",
 			}
+			signature = { enabled = false }
 			return opts
 		end,
 	},

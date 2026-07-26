@@ -24,8 +24,9 @@ return {
 					-- Не запускаем прочие установленные в Mason серверы автоматически.
 					automatic_enable = false,
 					ensure_installed = {
+						"ty",
+						"pyrefly",
 						"lua_ls",
-						"pyright",
 						"ruff",
 						"clangd",
 						"rust_analyzer",

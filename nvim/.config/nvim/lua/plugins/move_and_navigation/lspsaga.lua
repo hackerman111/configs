@@ -16,8 +16,8 @@ return {
 				title = true,
 				finder = " ",
 				definition = "📖 ",
-				code_action = "💡",
 				separator = " > ",
+				code_action = "💡",
 			},
 
 			lightbulb = {
@@ -94,10 +94,10 @@ return {
 			},
 
 			symbol_in_winbar = {
-				enable = true,
+				enable = false,
 				separator = " › ",
 				hide_keyword = true,
-				color_mode = true,
+				color_mode = false,
 			},
 
 			term = { enable = false },
@@ -115,38 +115,6 @@ return {
 					quit = "q",
 				},
 			},
-		})
-		-- Автоматически показывать LSP-документацию под курсором.
-		vim.opt.updatetime = 700
-
-		local hover_group = vim.api.nvim_create_augroup("LspsagaAutoHover", { clear = true })
-
-		vim.api.nvim_create_autocmd("CursorHold", {
-			group = hover_group,
-
-			callback = function(event)
-				-- Не открывать hover в Telescope, Trouble, терминале и прочих
-				-- служебных буферах.
-				if vim.bo[event.buf].buftype ~= "" then
-					return
-				end
-
-				-- Проверить, что подключён хотя бы один LSP с hover.
-				local has_hover = false
-
-				for _, client in ipairs(vim.lsp.get_clients({ bufnr = event.buf })) do
-					if client:supports_method("textDocument/hover") then
-						has_hover = true
-						break
-					end
-				end
-
-				if not has_hover then
-					return
-				end
-
-				vim.cmd("silent! Lspsaga hover_doc")
-			end,
 		})
 
 		-- Настройка горячих клавиш
