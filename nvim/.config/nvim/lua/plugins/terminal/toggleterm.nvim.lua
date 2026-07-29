@@ -67,10 +67,117 @@ return {
 					enabled = true,
 				},
 			})
+
+			local Terminal = require("toggleterm.terminal").Terminal
+
+			local runner_terminal = Terminal:new({
+				direction = "float",
+				hidden = true,
+				close_on_exit = false,
+				display_name = "Run current file",
+			})
+
+			local function get_run_command()
+				local file = vim.api.nvim_buf_get_name(0)
+
+				if file == "" then
+					vim.notify("Буфер не связан с файлом", vim.log.levels.WARN)
+					return nil
+				end
+
+				local escaped_file = vim.fn.shellescape(file)
+				local filetype = vim.bo.filetype
+
+				local commands = {
+					python = "python3 " .. escaped_file,
+					lua = "lua " .. escaped_file,
+					javascript = "node " .. escaped_file,
+					typescript = "npx tsx " .. escaped_file,
+					sh = "bash " .. escaped_file,
+					zsh = "zsh " .. escaped_file,
+					ruby = "ruby " .. escaped_file,
+					go = "go run " .. escaped_file,
+
+					c = "cc " .. escaped_file .. " -o /tmp/nvim-run && /tmp/nvim-run",
+
+					cpp = "c++ " .. escaped_file .. " -o /tmp/nvim-run && /tmp/nvim-run",
+				}
+
+				local command = commands[filetype]
+
+				if not command then
+					vim.notify(
+						"Нет команды запуска для filetype: " .. filetype,
+						vim.log.levels.WARN
+					)
+					return nil
+				end
+
+				return command
+			end
+
+			local function send_command_when_ready(command, attempt)
+				attempt = attempt or 1
+
+				if not runner_terminal.job_id then
+					if attempt >= 40 then
+						vim.notify("Не удалось запустить shell в ToggleTerm", vim.log.levels.ERROR)
+						return
+					end
+
+					vim.defer_fn(function()
+						send_command_when_ready(command, attempt + 1)
+					end, 25)
+
+					return
+				end
+
+				-- Даём zsh время вывести первый prompt.
+				vim.defer_fn(function()
+					if not runner_terminal.job_id then
+						return
+					end
+
+					-- Ctrl-U очищает текущую строку.
+					-- Ctrl-L очищает видимую область терминала.
+					local clear_line_and_screen = string.char(21, 12)
+
+					vim.api.nvim_chan_send(runner_terminal.job_id, clear_line_and_screen .. command)
+
+					if runner_terminal:is_open() then
+						vim.cmd.startinsert()
+					end
+				end, 200)
+			end
+
+			local function open_runner_with_command()
+				-- Получаем путь до переключения на terminal-buffer.
+				local command = get_run_command()
+
+				if not command then
+					return
+				end
+
+				-- open() нельзя вызывать прямо во время первой lazy-загрузки
+				-- по хоткею: переносим его за пределы текущего обработчика.
+				vim.schedule(function()
+					runner_terminal:open()
+					send_command_when_ready(command)
+				end)
+			end
+
+			vim.keymap.set("n", "<Leader>aT", open_runner_with_command, {
+				desc = "Терминал с запуском текущего файла",
+				silent = true,
+			})
 		end,
 		keys = {
 			{ "<F5>", desc = "Открыть/закрыть терминал" },
 			{ "<Leader>at", "<cmd>ToggleTerm direction=float<CR>", desc = "Плавающий терминал" },
+			{
+				"<Leader>aT",
+				desc = "Терминал с запуском текущего файла",
+			},
 		},
 	},
 }

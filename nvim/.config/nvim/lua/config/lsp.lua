@@ -4,7 +4,6 @@
 -- Подсветка ошибок
 
 local M = {}
-
 local servers = {
 	"lua_ls",
 	"ty",

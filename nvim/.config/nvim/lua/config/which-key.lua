@@ -284,6 +284,13 @@ local function register_custom_mappings(wk)
 		{ "<F12>", desc = "Открыть или закрыть терминал", mode = { "n", "i", "t" } },
 
 		{ "K", desc = "Показать документацию LSP", mode = "n" },
+		{ "q", desc = "Recorder: начать или остановить запись макроса", mode = "n" },
+		{ "Q", desc = "Recorder: воспроизвести макрос", mode = "n" },
+		{ "<C-q>", desc = "Recorder: сменить слот макроса", mode = "n" },
+		{ "cq", desc = "Recorder: редактировать макрос", mode = "n" },
+		{ "dq", desc = "Recorder: удалить все макросы", mode = "n" },
+		{ "yq", desc = "Recorder: скопировать макрос", mode = "n" },
+		{ "##", desc = "Recorder: добавить точку останова", mode = "n" },
 		{ "gd", desc = "Перейти к определению", mode = "n" },
 		{ "gD", desc = "Перейти к определению типа", mode = "n" },
 		{ "ga", group = "Регистр текста", icon = icon("󰬴 ", "yellow"), mode = { "n", "x" } },
