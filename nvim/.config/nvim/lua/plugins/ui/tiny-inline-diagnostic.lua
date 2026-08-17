@@ -1,7 +1,7 @@
 return {
 	"rachartier/tiny-inline-diagnostic.nvim",
-	event = "VeryLazy",
-	priority = 1000,
+	event = "LspAttach",
+	priority = 10000,
 	config = function()
 		require("tiny-inline-diagnostic").setup({
 			-- Choose a preset style for diagnostic appearance
@@ -59,7 +59,7 @@ return {
 				throttle = 20,
 
 				-- Minimum number of characters before wrapping long messages
-				softwrap = 30,
+				softwrap = 10,
 
 				-- Control how diagnostic messages are displayed
 				-- NOTE: When using display_count = true, you need to enable multiline diagnostics with multilines.enabled = true
@@ -110,7 +110,7 @@ return {
 
 				-- Break long messages into separate lines
 				break_line = {
-					enabled = false, -- Enable automatic line breaking
+					enabled = true, -- Enable automatic line breaking
 					after = 30, -- Number of characters before inserting a line break
 				},
 

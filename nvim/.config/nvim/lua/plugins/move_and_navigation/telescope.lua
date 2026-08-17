@@ -151,6 +151,28 @@ return {
 								},
 							},
 						},
+
+						extensions = {
+							aerial = {
+								-- Показывать только иконку и название символа,
+								-- без строки исходного кода справа.
+								show_columns = "symbols",
+
+								col1_width = 3,
+								col2_width = 50,
+
+								format_symbol = function(symbol_path)
+									local depth = #symbol_path - 1
+									local name = symbol_path[#symbol_path]
+
+									if depth == 0 then
+										return name
+									end
+
+									return string.rep("  ", depth - 1) .. "├─ " .. name
+								end,
+							},
+						},
 						-- default mappings
 						mappings = {
 							i = {
@@ -173,11 +195,32 @@ return {
 			telescope.load_extension("frecency")
 			telescope.load_extension("egrepify")
 			telescope.load_extension("repo")
+			telescope.load_extension("aerial")
+
+			local function telescope_outline()
+				telescope.extensions.aerial.aerial({
+					prompt_title = "Outline",
+
+					initial_mode = "normal",
+					sorting_strategy = "ascending",
+
+					layout_strategy = "vertical",
+
+					layout_config = {
+						width = 0.65,
+						height = 0.80,
+						prompt_position = "top",
+						preview_height = 0.45,
+					},
+				})
+			end
+
+			vim.keymap.set("n", "<leader>o", telescope_outline, {
+				desc = "Outline текущего файла",
+			})
 
 			-- ВАШИ КЕЙМАПЫ
-			vim.keymap.set("n", "<leader>fd", function()
-				require("telescope").extensions.file_browser.file_browser()
-			end, { desc = "Открыть файловый браузер" })
+			vim.keymap.set("n", "<space>fd", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
 			vim.keymap.set("n", "<leader>ff", function()
 				builtin.find_files()
 			end, { desc = "Найти файлы" })

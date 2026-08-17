@@ -24,7 +24,7 @@ return {
 				enable = true,
 				sign = true,
 				sign_priority = 40,
-				virtual_text = true,
+				virtual_text = false,
 				virtual_text_priority = 100,
 			},
 
@@ -103,6 +103,7 @@ return {
 			term = { enable = false },
 
 			outline = {
+				layout = "float",
 				win_position = "right",
 				win_with = "editor",
 				win_width = 40,

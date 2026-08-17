@@ -1040,7 +1040,7 @@ AUR_PACKAGES=(
     sing-box
     throne-bin
     v2raya-bin
-    yandex-browser
+    #yandex-browser
     yay-bin
     zotero-git
     ventoy-bin

@@ -173,7 +173,11 @@ return {
 						{ get_diagnostic_label() },
 						{ get_git_diff() },
 						{ (ft_icon or "") .. " ", guifg = ft_color, guibg = "none" },
-						{ filename .. " ", gui = vim.bo[props.buf].modified and "bold,italic" or "bold" },
+						{
+							filename .. " ",
+							vim.bo[props.buf].modified and "●" or "✓",
+							gui = vim.bo[props.buf].modified and "bold,italic" or "bold",
+						},
 					}
 				end,
 			})

@@ -9,7 +9,7 @@ return {
 			formatters_by_ft = {
 				markdown = { "prettier" },
 				lua = { "stylua" },
-				python = { "isort", "black" },
+				python = { "isort", "ruff" },
 				cpp = { "clang_format" },
 			},
 			format_on_save = {

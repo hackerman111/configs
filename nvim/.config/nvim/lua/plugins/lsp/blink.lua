@@ -38,7 +38,7 @@ return {
 			"moyiz/blink-emoji.nvim",
 			"onsails/lspkind.nvim",
 			"Kaiser-Yang/blink-cmp-dictionary",
-			"fang2hou/blink-copilot",
+			--"fang2hou/blink-copilot",
 			"mikavilpas/blink-ripgrep.nvim",
 		},
 
