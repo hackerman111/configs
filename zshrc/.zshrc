@@ -110,6 +110,27 @@ alias mkdir='mkdir -p'
 alias cp='cp -i'
 alias mv='mv -i'
 
+unalias bookokrat 2>/dev/null
+
+_bookokrat_cleanup() {
+    if [[ -n "$TMUX" ]]; then
+        printf '\ePtmux;\e\e_Ga=d,d=Z,z=-1,q=2\e\e\\\e\\'
+    else
+        printf '\e_Ga=d,d=Z,z=-1,q=2\e\\'
+    fi
+}
+
+_bookokrat() {
+    command bookokrat "$@"
+    local rc=$?
+
+    _bookokrat_cleanup
+
+    return $rc
+}
+
+alias bookokrat='_bookokrat'
+
 # -----------------------------------------------------------------------------
 # FZF / SEARCH / NAVIGATION
 # -----------------------------------------------------------------------------

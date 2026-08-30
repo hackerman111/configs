@@ -101,9 +101,6 @@ return {
 			local config_path = vim.fn.stdpath("config")
 
 			dashboard.section.buttons.val = {
-				dashboard.button("o", "  Недавние файлы", ":Telescope oldfiles <CR>"),
-				dashboard.button("p", "  Заметки", ":HarpoonTelescope <CR>"),
-				dashboard.button("g", "  Найти по тексту", ":Telescope live_grep <CR>"),
 				dashboard.button(
 					"c",
 					"  Файлы конфига",

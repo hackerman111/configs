@@ -556,7 +556,9 @@ AUR_PACKAGES=(
     xkb-switch
     xray-core
     yay-bin
+    bookokrat-bin
     zotero-git
+
 )
 
 print_info "Установка из AUR: ${AUR_PACKAGES[*]}"
