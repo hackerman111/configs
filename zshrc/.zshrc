@@ -1125,3 +1125,7 @@ fi
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 path=("$HOME/go/bin" "$HOME/.local/bin" $path)
 [[ -r "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/papayka/.local/bin:$PATH"

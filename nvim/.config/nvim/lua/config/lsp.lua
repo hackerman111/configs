@@ -7,13 +7,21 @@ local M = {}
 local servers = {
 	"lua_ls",
 	"ty",
-	"pyrefly",
 	"ruff",
 	"clangd",
 	"rust_analyzer",
 	"texlab",
 	"marksman",
 }
+
+local function quickfix()
+	vim.lsp.buf.code_action({
+		apply = true,
+		context = {
+			only = { "quickfix" },
+		},
+	})
+end
 
 local function configure_lsp_capability()
 	local capabilities = require("blink.cmp").get_lsp_capabilities()
@@ -31,6 +39,11 @@ local function configure_lsp_attaches()
 		group = group,
 		callback = function(event)
 			local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+			vim.keymap.set("n", "<leader>cf", quickfix, {
+				buffer = event.buf,
+				desc = "Apply quick fix",
+			})
 
 			if not client then
 				return

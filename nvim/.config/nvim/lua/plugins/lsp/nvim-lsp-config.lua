@@ -25,7 +25,6 @@ return {
 					automatic_enable = false,
 					ensure_installed = {
 						"ty",
-						"pyrefly",
 						"lua_ls",
 						"ruff",
 						"clangd",

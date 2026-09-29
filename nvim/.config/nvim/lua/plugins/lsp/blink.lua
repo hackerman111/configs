@@ -66,7 +66,19 @@ return {
 			-- NOTE: The new way to enable LuaSnip
 			-- Merge custom sources with the existing ones from lazyvim
 			-- NOTE: by default lazyvim already includes the lazydev source, so not adding it here again
-			opts.snippets = { snippets = { preset = "luasnip" } }
+			opts.snippets = { preset = "luasnip" }
+
+			opts.fuzzy = {
+				fuzzy = {
+					implementation = "prefer_rust",
+
+					max_typos = function(keyword)
+						return #keyword >= 6 and 1 or 0
+					end,
+
+					sorts = { "exact", "score", "sort_text" },
+				},
+			}
 
 			opts.sources = vim.tbl_deep_extend("force", opts.sources or {}, {
 				-- The trigger_characters option is removed from here as we want snippets to show always
@@ -114,6 +126,8 @@ return {
 						enabled = true,
 						module = "blink.cmp.sources.lsp",
 						min_keyword_length = 1,
+						max_items = 28,
+
 						-- When linking markdown notes, I would get snippets and text in the
 						-- suggestions, I want those to show only if there are no LSP
 						-- suggestions
@@ -122,12 +136,13 @@ return {
 						-- Disabling fallbacks as my snippets wouldn't show up when editing
 						-- lua files
 						-- fallbacks = { "snippets", "buffer" },
-						score_offset = 99, -- the higher the number, the higher the priority
+						-- score_offset = 99, -- the higher the number, the higher the priority
 					},
+
 					path = {
 						name = "Path",
 						module = "blink.cmp.sources.path",
-						score_offset = 100,
+						-- score_offset = 100,
 						-- When typing a path, I would get snippets and text in the
 						-- suggestions, I want those to show only if there are no path
 						-- suggestions
@@ -141,6 +156,7 @@ return {
 							end,
 							show_hidden_files_by_default = true,
 						},
+						max_items = 5,
 					},
 					-- buffer = {
 					--     name = "Buffer",
@@ -224,7 +240,7 @@ return {
 					-- 'prefix' will fuzzy match on the text before the cursor
 					-- 'full' will fuzzy match on the text before *and* after the cursor
 					-- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
-					range = "full",
+					range = "prefix",
 				},
 				ghost_text = { enabled = false },
 				menu = {
