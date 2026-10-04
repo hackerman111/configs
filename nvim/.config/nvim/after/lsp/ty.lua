@@ -14,7 +14,7 @@ return {
 
 				-- Не добавлять скобки автоматически.
 				-- Это лучше оставить completion-движку и сниппетам.
-				completeFunctionParentheses = false,
+				completeFunctionParentheses = true,
 			},
 
 			inlayHints = {

@@ -31,7 +31,7 @@ opt.undofile = true -- Сохранять историю изменений ме
 
 -- Автодополнение и документацию показывает только Blink.
 -- Python ftplugin иначе включает отдельный встроенный popup.
-opt.completeopt = { "menuone", "noselect", "noinsert" }
+opt.completeopt = { "menuone", "noinsert" }
 
 local completion_group = vim.api.nvim_create_augroup("user-blink-only-completion", {
 	clear = true,

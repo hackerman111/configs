@@ -130,7 +130,7 @@ set -g message-style 'fg=#2e3440,bg=#88c0d0,bold'
 set -g message-command-style 'fg=#2e3440,bg=#ebcb8b,bold'
 set -g mode-style 'fg=#88c0d0,bg=#3b4252,bold'
 set -g popup-style 'fg=#eceff4,bg=#2e3440'
-set -g popup-border-style 'fg=#81a1c1,bg=default'
+set -g popup-border-style 'fg=#81a1c1,bg=#2e3440'
 set -g menu-style 'fg=#d8dee9,bg=#3b4252'
 set -g menu-selected-style 'fg=#2e3440,bg=#88c0d0,bold'
 set -g clock-mode-colour '#88c0d0'
@@ -153,30 +153,27 @@ set -g status-right '#{?window_zoomed_flag,#[fg=#ebcb8b]zoom │ ,}#{tmux_mode_i
 # -----------------------------------------------------------------------------
 # TPM PLUGINS
 # -----------------------------------------------------------------------------
-
 set -g @plugin 'tmux-plugins/tpm'
-set -g @mox_entry_key M-m
-# set -g @plugin 'hackerman111/tmux-tea'
+set -g @plugin 'hackerman111/tmux-tea'
 
 # Theme
 set -g @plugin 'nordtheme/tmux'
-set -g @plugin 'hackerman111/Mox'
 
 # Core
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 
-# # Discoverability / modal / navigation
-# set -g @tmux-which-key-xdg-enable 1
-# set -g @tmux-which-key-xdg-plugin-path '.config/tmux/plugins/tmux-which-key'
-# set -g @plugin 'alexwforsythe/tmux-which-key'
+# Discoverability / modal / navigation
+set -g @tmux-which-key-xdg-enable 1
+set -g @tmux-which-key-xdg-plugin-path '.config/tmux/plugins/tmux-which-key'
+set -g @plugin 'alexwforsythe/tmux-which-key'
 
-# set -g @plugin 'whame/tmux-modal'
-# set -g @modal-always-sticky on
-# set -g @modal-show-cmd-keys on
-# set -g @modal-cmd-icon " 🟢"
-# set -g status-right '#{?window_zoomed_flag,#[fg=#ebcb8b]zoom │ ,}#{?#{==:#{client_key_table},ktm-cmd},#[fg=#a3be8c]🟢 MODAL ,}#{tmux_mode_indicator} #[fg=#81a1c1]#{pane_current_command} #[fg=#4c566a]│ #[fg=#81a1c1]%Y-%m-%d #[fg=#88c0d0]%H:%M '
-# set -g status-right '#{?window_zoomed_flag,#[fg=#ebcb8b]zoom │ ,}#{?#{m:#{client_key_table},ktm-*},#[fg=#a3be8c]🟢 #{client_key_table} ,}#{tmux_mode_indicator} #[fg=#81a1c1]#{pane_current_command} #[fg=#4c566a]│ #[fg=#81a1c1]%Y-%m-%d #[fg=#88c0d0]%H:%M '
+set -g @plugin 'whame/tmux-modal'
+set -g @modal-always-sticky on
+set -g @modal-show-cmd-keys on
+set -g @modal-cmd-icon " 🟢"
+set -g status-right '#{?window_zoomed_flag,#[fg=#ebcb8b]zoom │ ,}#{?#{==:#{client_key_table},ktm-cmd},#[fg=#a3be8c]🟢 MODAL ,}#{tmux_mode_indicator} #[fg=#81a1c1]#{pane_current_command} #[fg=#4c566a]│ #[fg=#81a1c1]%Y-%m-%d #[fg=#88c0d0]%H:%M '
+set -g status-right '#{?window_zoomed_flag,#[fg=#ebcb8b]zoom │ ,}#{?#{m:#{client_key_table},ktm-*},#[fg=#a3be8c]🟢 #{client_key_table} ,}#{tmux_mode_indicator} #[fg=#81a1c1]#{pane_current_command} #[fg=#4c566a]│ #[fg=#81a1c1]%Y-%m-%d #[fg=#88c0d0]%H:%M '
 
 set -g @plugin 'schasse/tmux-jump'
 

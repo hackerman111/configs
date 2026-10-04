@@ -10,7 +10,8 @@ return {
 		"neovim/nvim-lspconfig",
 
 		dependencies = {
-			"saghen/blink.cmp",
+			-- "saghen/blink.cmp",
+			"ms-jpq/coq_nvim",
 
 			{
 				"mason-org/mason.nvim",
@@ -28,6 +29,7 @@ return {
 						"lua_ls",
 						"ruff",
 						"clangd",
+						"jedi_language_server",
 						"rust_analyzer",
 						"texlab",
 						"marksman",
