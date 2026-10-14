@@ -281,6 +281,53 @@ hl.bind(mainMod .. " + CTRL + L", hl.dsp.dpms({ action = "off" }))
 
 -- Window layout.
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+-- hl.bind(mainMod .. " + SHIFT + V", function()
+-- 	hl.dispatch(hl.dsp.window.set_prop({ prop = "hide_from_screen_share", value = "toggle" }))
+-- 	hl.dispatch(hl.dsp.window.set_prop({ prop = "preserve_previous_focus", value = "on" }))
+-- end)
+-- hl.bind(mainMod .. " + SHIFT + G", function()
+-- 	hl.dispatch(hl.dsp.window.fullscreen({ mode = "fullscreen", action = "set" }))
+-- 	hl.dispatch(hl.dsp.window.set_prop({ prop = "focus_guard", value = "toggle" }))
+-- end)
+------------------
+-- hl.bind(mainMod .. " + CTRL + V", function()
+-- 	local anchor = hl.get_active_window()
+-- 	local private = hl.get_windows({ class = "org.telegram.desktop" })[1]
+-- 	if not anchor or not private or anchor == private then
+-- 		return
+-- 	end
+-- 	hl.dispatch(hl.dsp.window.set_prop({ window = private, prop = "hide_from_screen_share", value = "on" }))
+-- 	hl.dispatch(hl.dsp.window.set_prop({ window = private, prop = "preserve_previous_focus", value = "on" }))
+-- 	hl.dispatch(hl.dsp.window.float({ window = private, action = "enable" }))
+-- 	hl.dispatch(hl.dsp.window.move({ window = private, workspace = anchor.workspace, follow = false }))
+-- 	hl.dispatch(hl.dsp.focus({ window = private }))
+-- end)
+hl.window_rule({
+	match = { class = "firefox" },
+	opacity = "0.2 override 0.2 override 0.2 override",
+})
+
+hl.bind(mainMod .. " + SHIFT + V", function()
+	local window = hl.get_active_window()
+	if not window then
+		return
+	end
+	hl.dispatch(hl.dsp.window.set_prop({
+		window = window,
+		prop = "opacity",
+		value = "0.2",
+	}))
+
+	hl.dispatch(hl.dsp.window.set_prop({
+		window = window,
+		prop = "hide_from_screen_share",
+		value = "toggle",
+	}))
+	hl.dispatch(hl.dsp.window.set_prop({ window = window, prop = "preserve_previous_focus", value = "toggle" }))
+end)
+
+------------------
+hl.bind(mainMod .. " + CTRL + B", hl.dsp.focus({ window = "active" }))
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + CTRL + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind(mainMod .. " + CTRL + SPACE", hl.dsp.window.center())

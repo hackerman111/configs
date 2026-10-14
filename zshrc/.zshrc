@@ -1115,10 +1115,6 @@ function zvm_after_lazy_keybindings() {
   zvm_bindkey vicmd "$terminfo[kcud1]" history-substring-search-down
 }
 
-# Автозапуск tmux
-if [[ -z "$TMUX" ]] && [[ $- == *i* ]]; then
-    exec tmux new-session 
-fi
 # -----------------------------------------------------------------------------
 # LOCAL OVERRIDES
 # -----------------------------------------------------------------------------

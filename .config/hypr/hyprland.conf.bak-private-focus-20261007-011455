@@ -1,0 +1,598 @@
+# This is an example Hyprland config file.
+# Refer to the wiki for more information.
+# https://wiki.hypr.land/Configuring/
+
+# Please note not all available settings / options are set here.
+# For a full list, see the wiki
+
+# You can split this configuration into multiple files
+# Create your files separately and then link them to this file like this:
+# source = ~/.config/hypr/myColors.conf
+
+
+################
+### MONITORS ###
+################
+
+# See https://wiki.hypr.land/Configuring/Monitors/
+monitor = DP-1, 1920x1080@144, 0x0, 1
+
+
+
+
+
+###################
+### MY PROGRAMS ###
+###################
+
+# See https://wiki.hypr.land/Configuring/Keywords/
+
+# Core apps
+$terminal = ghostty
+$fileManager = yazi
+$menu = wofi --show drun
+$browser = librewolf
+$messenger = Telegram
+
+
+
+#################
+### AUTOSTART ###
+#################
+
+exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
+exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
+exec-once = hyprpaper
+exec-once = waybar
+exec-once = sh -c 'command -v dunst >/dev/null && dunst'
+exec-once = sh -c 'command -v nm-applet >/dev/null && nm-applet --indicator'
+exec-once = sh -c 'command -v blueman-applet >/dev/null && blueman-applet'
+exec-once = sh -c 'command -v hypridle >/dev/null && hypridle'
+exec-once = sh -c 'hyprpm reload' 
+exec-once = sh -c 'hyprctl reload'
+exec-once = sh -c 'hyprpm list'
+
+# Автозапуск приложений на конкретных workspaces
+exec-once = [workspace 10] ghostty
+exec-once = [workspace 2] $messenger
+exec-once = [workspace special:hidden silent] firefox
+exec-once = [workspace special:magic silent] obsidian
+exec-once = [workspace 1] ghostty
+exec-once = [workspace 4] $browser
+
+# Шаг 2: Привязываем окна к рабочим столам по их классу или заголовку.
+#
+# Синтаксис: windowrulev2 = workspace <номер>, <правило>
+# Например, 'class:^(kitty)$' означает "окно, у которого класс - kitty".
+
+
+#############################
+### ENVIRONMENT VARIABLES ###
+#############################
+
+# See https://wiki.hypr.land/Configuring/Environment-variables/
+
+env = XCURSOR_SIZE,24
+env = HYPRCURSOR_SIZE,24
+env = XDG_CURRENT_DESKTOP,Hyprland
+env = XDG_SESSION_DESKTOP,Hyprland
+env = XDG_SESSION_TYPE,wayland
+env = GDK_BACKEND,wayland,x11
+env = QT_QPA_PLATFORM,wayland;xcb
+env = SDL_VIDEODRIVER,wayland
+env = CLUTTER_BACKEND,wayland
+env = ELECTRON_OZONE_PLATFORM_HINT,auto
+
+
+###################
+### PERMISSIONS ###
+###################
+
+# See https://wiki.hypr.land/Configuring/Permissions/
+# Please note permission changes here require a Hyprland restart and are not applied on-the-fly
+# for security reasons
+
+# ecosystem {
+#   enforce_permissions = 1
+# }
+
+# permission = /usr/(bin|local/bin)/grim, screencopy, allow
+# permission = /usr/(lib|libexec|lib64)/xdg-desktop-portal-hyprland, screencopy, allow
+# permission = /usr/(bin|local/bin)/hyprpm, plugin, allow
+
+
+#####################
+### LOOK AND FEEL ###
+#####################
+
+# Refer to https://wiki.hypr.land/Configuring/Variables/
+
+# #######################################################################################
+# ############               ОФОРМЛЕНИЕ И АНИМАЦИИ (NORD THEME)                ############
+# #######################################################################################
+
+# ---------------------------------------------------------------------------------------
+# Основные цвета палитры Nord. Можно использовать как переменные.
+# ---------------------------------------------------------------------------------------
+$nord0 = 2E3440 # Темно-серый, почти черный (фон)
+$nord1 = 3B4252 # Серый (чуть светлее)
+$nord2 = 434C5E
+$nord3 = 4C566A # Светло-серый (неактивные элементы)
+$nord4 = D8DEE9 # Белый (текст)
+$nord5 = E5E9F0
+$nord6 = ECEFF4 # Ярко-белый
+$nord7 = 8FBCBB # Бирюзовый
+$nord8 = 88C0D0 # Голубой
+$nord9 = 81A1C1 # Синий
+$nord10 = 5E81AC # Темно-синий
+$nord11 = B48EAD # Фиолетовый
+$nord12 = BF616A # Красный
+$nord13 = D08770 # Оранжевый
+$nord14 = EBCB8B # Желтый
+$nord15 = A3BE8C # Зеленый
+
+# ---------------------------------------------------------------------------------------
+# Общие настройки, влияющие на внешний вид
+# ---------------------------------------------------------------------------------------
+general {
+    # i3-like tight tiling: окна вплотную, без внутренних и внешних зазоров.
+    gaps_in = 0
+    gaps_out = 0
+
+    border_size = 2
+
+    col.active_border = rgb($nord8) rgb($nord10) rgb($nord11) 45deg
+    col.inactive_border = rgb($nord2)
+
+    resize_on_border = true
+    extend_border_grab_area = 8
+    allow_tearing = false
+    layout = dwindle
+}
+
+
+# ---------------------------------------------------------------------------------------
+# Декорации: скругления, тени, размытие
+# ---------------------------------------------------------------------------------------
+decoration {
+    # i3-like: прямые углы и непрозрачные окна.
+    rounding = 0
+    rounding_power = 2
+
+    active_opacity = 1.0
+    inactive_opacity = 1.0
+    fullscreen_opacity = 1.0
+
+    shadow {
+        enabled = false
+        range = 0
+        render_power = 0
+        color = rgba(1f243000)
+        color_inactive = rgba(1f243000)
+    }
+
+    blur {
+        enabled = true
+        size = 5
+        passes = 2
+        vibrancy = 0.16
+        noise = 0.01
+        contrast = 0.95
+        brightness = 0.9
+    }
+}
+
+layerrule {
+    name = blur-waybar
+    match:namespace = waybar
+    blur = on
+    ignore_alpha = 0
+}
+
+layerrule {
+    name = blur-wofi
+    match:namespace = wofi
+    blur = on
+    ignore_alpha = 0
+}
+
+layerrule {
+    name = blur-notifications
+    match:namespace = notifications
+    blur = on
+}
+
+
+# ---------------------------------------------------------------------------------------
+# Анимации: плавные и сдержанные, без "отскоков"
+# ---------------------------------------------------------------------------------------
+animations {
+    enabled = yes
+
+    # -- Кривые Безье в стиле Nord: плавность без резкости --
+    bezier = nordBezier, 0.0, 0.5, 0.5, 1.0 # Классическая кривая ease-out-quint
+    bezier = linear, 0, 0, 1, 1
+
+    # -- Назначение анимаций и их параметров --
+
+    # Анимация окон
+    animation = windows, 1, 6, nordBezier, slide
+    animation = windowsIn, 1, 6, nordBezier, slide
+    animation = windowsOut, 1, 6, nordBezier, slide
+    animation = windowsMove, 1, 5, default
+
+    # Анимация затухания
+    animation = fadeIn, 1, 7, nordBezier
+    animation = fadeOut, 1, 7, nordBezier
+
+    # Анимация рамок окон
+    animation = border, 1, 10, linear
+    animation = borderangle, 1, 20, linear
+
+    # Анимация рабочих столов: чуть короче и плотнее под i3-like layout.
+    animation = workspaces, 1, 4, nordBezier, slidefade 28%
+
+    # Анимация специальных рабочих столов
+    animation = specialWorkspace, 1, 6, nordBezier, slidefadevert 35%
+}
+
+# ---------------------------------------------------------------------------------------
+# Plugins: hyprEasymotion + Hyprtasking
+# Устанавливаются через hyprpm. Эти настройки безопасно лежат в конфиге,
+# но заработают только после загрузки соответствующих plugins.
+# ---------------------------------------------------------------------------------------
+plugin {
+    easymotion {
+        textsize = 18
+        textfont = JetBrainsMono Nerd Font
+        textcolor = rgba(ECEFF4ff)
+        bgcolor = rgba(2E3440dd)
+        blur = 1
+        blurA = 0.85
+        xray = 0
+        textpadding = 4 8 4 8
+        bordersize = 2
+        bordercolor = rgba(88C0D0ff) rgba(5E81ACff) 45deg
+        rounding = 8
+        fullscreen_action = toggle
+        motionkeys = aoeuidhtnsqjkxbmwvz1234567890
+        motionlabels = AOEUIDHTNSQJKXBMWVZ1234567890
+        only_special = true
+    }
+
+    hyprtasking {
+        layout = grid
+        gap_size = 12
+        bg_color = 0xee2E3440
+        border_size = 2
+        exit_on_hovered = false
+        warp_on_move_window = 1
+        close_overview_on_reload = true
+        drag_button = 0x110
+        select_button = 0x111
+
+        gestures {
+            enabled = true
+            move_fingers = 3
+            move_distance = 280
+            open_fingers = 4
+            open_distance = 280
+            open_positive = true
+        }
+
+        # Твоя текущая логика уже похожа на 2x10: 1..10 и bank2 = 11..20.
+        # Если добавишь 21..30, поменяй rows = 3, cols = 10.
+        grid {
+            rows = 4
+            cols = 4
+            loop = false
+            layers = 2
+            loop_layers = false
+            gaps_use_aspect_ratio = true
+        }
+
+        linear {
+            top = false
+            height = 360
+            scroll_speed = 1.0
+            blur = true
+        }
+    }
+}
+
+
+# ---------------------------------------------------------------------------------------
+# Разные твики
+# ---------------------------------------------------------------------------------------
+misc {
+    force_default_wallpaper = 0
+    disable_hyprland_logo = true
+    disable_splash_rendering = true
+    mouse_move_enables_dpms = true
+    key_press_enables_dpms = true
+}
+
+# Ref https://wiki.hypr.land/Configuring/Workspace-Rules/
+# "Smart gaps" / "No gaps when only"
+# uncomment all if you wish to use that.
+# workspace = w[tv1], gapsout:0, gapsin:0
+# workspace = f[1], gapsout:0, gapsin:0
+# windowrule = bordersize 0, floating:0, onworkspace:w[tv1]
+# windowrule = rounding 0, floating:0, onworkspace:w[tv1]
+# windowrule = bordersize 0, floating:0, onworkspace:f[1]
+# windowrule = rounding 0, floating:0, onworkspace:f[1]
+
+# See https://wiki.hypr.land/Configuring/Dwindle-Layout/ for more
+dwindle {
+    #pseudotile = true # Master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
+    preserve_split = true # You probably want this
+    force_split = 2 # 0 - автоматическое разделение, 1 - всегда вправо, 2 - всегда вниз
+
+}
+
+# See https://wiki.hypr.land/Configuring/Master-Layout/ for more
+master {
+    new_status = master
+}
+
+
+#############
+### INPUT ###
+#############
+
+# https://wiki.hypr.land/Configuring/Variables/#input
+input {
+    kb_layout = us, ru
+    kb_variant =dvorak, diktor
+    kb_model =
+    kb_options = grp:alt_shift_toggle
+    kb_rules =
+
+    follow_mouse = 1
+    repeat_rate = 35
+    repeat_delay = 250
+
+    sensitivity = 0 # -1.0 - 1.0, 0 means no modification.
+
+    touchpad {
+        natural_scroll = false
+        tap-to-click = true
+        disable_while_typing = true
+        scroll_factor = 0.7
+    }
+}
+
+# https://wiki.hypr.land/Configuring/Variables/#gestures
+
+# Example per-device config
+# See https://wiki.hypr.land/Configuring/Keywords/#per-device-input-configs for more
+device {
+    name = epic-mouse-v1
+    sensitivity = -0.5
+}
+
+###################
+### KEYBINDINGS ###
+###################
+
+# See https://wiki.hypr.land/Configuring/Keywords/
+$mainMod = SUPER # Sets "Windows" key as main modifier
+
+
+
+# Launching and session controls
+bind = $mainMod, Return, exec, $terminal
+bind = $mainMod, Q, exec, $terminal
+bind = $mainMod, E, exec, ghostty -e yazi
+bind = $mainMod, R, exec, $menu
+bind = $mainMod, SPACE, exec, $menu
+bind = $mainMod, a, exec, aimp
+bind = $mainMod, C, killactive,
+bind = $mainMod SHIFT, Q, killactive,
+bind = $mainMod, L, exec, hyprlock
+bind = $mainMod SHIFT, R, exec, hyprctl reload && pkill -SIGUSR2 waybar
+bind = $mainMod CTRL, L, exec, hyprctl dispatch dpms off
+
+# Window layout
+bind = $mainMod, V, togglefloating,
+bind = $mainMod SHIFT, V, exec, hyprctl dispatch hl.dsp.window.set_prop({ window = 'active', prop = 'hide_from_screen_share', value = 'on' })
+bind = $mainMod, J, layoutmsg, togglesplit # dwindle
+bind = $mainMod CTRL, F, fullscreen, 0
+bind = $mainMod CTRL, SPACE, centerwindow
+
+
+
+
+# Tools from the Hyprland ecosystem
+bind = $mainMod, P, exec, hyprshot -z --mode active -m window
+bind = $mainMod ALT, P, exec, hyprshot -m output
+bind = $mainMod SHIFT, P, exec, hyprshot -m region
+bind = $mainMod, X, exec, sh -c 'command -v hyprpicker >/dev/null && hyprpicker -a'
+bind = $mainMod, O, exec, /home/papayka/configs/.config/hypr/wall-switcher.sh
+bind = $mainMod SHIFT, O, exec, hyprctl dispatch dpms off
+
+# Scratch workspaces
+bind = $mainMod SHIFT, F, movetoworkspace, special:hidden
+bind = $mainMod, F, togglespecialworkspace, hidden
+bind = $mainMod SHIFT, B, movetoworkspace, special:hidden2
+bind = $mainMod, B, togglespecialworkspace, hidden2
+bind = $mainMod, S, togglespecialworkspace, magic
+bind = $mainMod SHIFT, S, movetoworkspace, special:magic
+
+
+# Move focus with mainMod + arrow keys
+bind = $mainMod, h, movefocus, l
+bind = $mainMod, l, movefocus, r
+bind = $mainMod, k, movefocus, u
+bind = $mainMod, j, movefocus, d
+
+# Move and resize windows with vim-like chords
+binde = $mainMod SHIFT, h, movewindow, l
+binde = $mainMod SHIFT, l, movewindow, r
+binde = $mainMod SHIFT, k, movewindow, u
+binde = $mainMod SHIFT, j, movewindow, d
+binde = $mainMod CTRL, h, resizeactive, -40 0
+binde = $mainMod CTRL, l, resizeactive, 40 0
+binde = $mainMod CTRL, k, resizeactive, 0 -40
+binde = $mainMod CTRL, j, resizeactive, 0 40
+
+# Switch workspaces with mainMod + [0-9]
+bind = $mainMod, 1, workspace, 1
+bind = $mainMod, 2, workspace, 2
+bind = $mainMod, 3, workspace, 3
+bind = $mainMod, 4, workspace, 4
+bind = $mainMod, 5, workspace, 5
+bind = $mainMod, 6, workspace, 6
+bind = $mainMod, 7, workspace, 7
+bind = $mainMod, 8, workspace, 8
+bind = $mainMod, 9, workspace, 9
+bind = $mainMod, 0, workspace, 10
+
+# Move active window to a workspace with mainMod + SHIFT + [0-9]
+bind = $mainMod SHIFT, 1, movetoworkspace, 1
+bind = $mainMod SHIFT, 2, movetoworkspace, 2
+bind = $mainMod SHIFT, 3, movetoworkspace, 3
+bind = $mainMod SHIFT, 4, movetoworkspace, 4
+bind = $mainMod SHIFT, 5, movetoworkspace, 5
+bind = $mainMod SHIFT, 6, movetoworkspace, 6
+bind = $mainMod SHIFT, 7, movetoworkspace, 7
+bind = $mainMod SHIFT, 8, movetoworkspace, 8
+bind = $mainMod SHIFT, 9, movetoworkspace, 9
+bind = $mainMod SHIFT, 0, movetoworkspace, 10
+# =========================================================
+# Второй набор рабочих столов (слой bank2)
+# SUPER+`      -> войти во второй слой
+# 1..0         -> workspaces 11..20
+# SHIFT+1..0   -> перенести окно на 11..20
+# ESC / SUPER+` -> выйти обратно
+# =========================================================
+
+bind = $mainMod, grave, submap, bank2
+
+submap = bank2
+
+# Переключение на второй набор workspaces
+# Switch workspaces with mainMod + [0-9]
+bind = $mainMod, 1, workspace,11
+bind = $mainMod, 2, workspace,12
+bind = $mainMod, 3, workspace,13
+bind = $mainMod, 4, workspace,14
+bind = $mainMod, 5, workspace,15
+bind = $mainMod, 6, workspace,16
+bind = $mainMod, 7, workspace,17
+bind = $mainMod, 8, workspace,18
+bind = $mainMod, 9, workspace,19
+bind = $mainMod, 0, workspace,20
+
+# Перенос активного окна во второй набор workspaces
+bind = SHIFT, 1, movetoworkspace, 11
+bind = SHIFT, 2, movetoworkspace, 12
+bind = SHIFT, 3, movetoworkspace, 13
+bind = SHIFT, 4, movetoworkspace, 14
+bind = SHIFT, 5, movetoworkspace, 15
+bind = SHIFT, 6, movetoworkspace, 16
+bind = SHIFT, 7, movetoworkspace, 17
+bind = SHIFT, 8, movetoworkspace, 18
+bind = SHIFT, 9, movetoworkspace, 19
+bind = SHIFT, 0, movetoworkspace, 20
+
+# Выход из второго слоя
+bind = $mainMod, grave, submap, reset
+bind = , escape, submap, reset
+
+submap = reset
+
+# Scroll through existing workspaces with mainMod + scroll
+bind = $mainMod, mouse_down, workspace, e+1
+bind = $mainMod, mouse_up, workspace, e-1
+
+# Move/resize windows with mainMod + LMB/RMB and dragging
+bindm = $mainMod, mouse:272, movewindow
+bindm = $mainMod, mouse:273, resizewindow
+# Laptop multimedia keys for volume and LCD brightness
+bindel = ,XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
+bindel = ,XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindel = ,XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindel = ,XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+bindel = ,XF86MonBrightnessUp, exec, brightnessctl -e4 -n2 set 5%+
+bindel = ,XF86MonBrightnessDown, exec, brightnessctl -e4 -n2 set 5%-
+bind = SUPER, Y, exec, $browser
+bind = SUPER, T, exec, $messenger
+
+# Старый floating-cycle перенесен с SUPER+Tab, потому что SUPER+Tab теперь занят Hyprtasking.
+# Работает только когда нужен простой цикл по floating-окнам.
+bind = $mainMod CTRL, Tab, cyclenext
+bind = $mainMod CTRL, Tab, bringactivetotop
+
+# Requires playerctl
+bindl = , XF86AudioNext, exec, playerctl next
+bindl = , XF86AudioPause, exec, playerctl play-pause
+bindl = , XF86AudioPlay, exec, playerctl play-pause
+bindl = , XF86AudioPrev, exec, playerctl previous
+
+##############################
+### WINDOWS AND WORKSPACES ###
+##############################
+
+# See https://wiki.hypr.land/Configuring/Window-Rules/ for more
+# See https://wiki.hypr.land/Configuring/Workspace-Rules/ for workspace rules
+
+# Example windowrule
+# windowrule = float,class:^(kitty)$,title:^(kitty)$
+
+workspace = 1, monitor:DP-1, default:true
+workspace = 2, monitor:DP-1
+workspace = 3, monitor:DP-1
+workspace = 4, monitor:DP-1
+workspace = 5, monitor:DP-1
+workspace = special:hidden, gapsout:8, gapsin:0
+workspace = special:hidden2, gapsout:8, gapsin:0
+workspace = special:magic, gapsout:8, gapsin:0
+
+workspace = w[tv1], gapsout:0, gapsin:0
+workspace = f[1], gapsout:0, gapsin:0
+windowrule = border_size 0, match:float false, match:workspace w[tv1]
+windowrule = rounding 0, match:float false, match:workspace w[tv1]
+windowrule = border_size 0, match:float false, match:workspace f[1]
+windowrule = rounding 0, match:float false, match:workspace f[1]
+
+windowrule {
+    name = suppress-maximize-events
+    match:class = .*
+    suppress_event = maximize
+}
+
+windowrule {
+    name = inhibit-idle-while-fullscreen
+    match:fullscreen = true
+    idle_inhibit = fullscreen
+}
+
+
+windowrule {
+    name = picture-in-picture
+    match:title = ^(Picture-in-Picture)$
+    float = on
+    pin = on
+    size = 420 236
+}
+
+
+windowrule {
+    name = file-manager-size
+    match:class = ^(org.gnome.Nautilus|thunar)$
+    size = 900 620
+}
+
+windowrule {
+    name = ghostty-opacity
+    match:class = ^(ghostty)$
+    opacity = 0.96 0.90
+}
+
+windowrule {
+    name = browser-opacity
+    match:class = ^(firefox|yandex-browser|yandex-browser-stable|Google-chrome|chromium|librewolf)$
+    opacity = 0.98 0.94
+}
+
